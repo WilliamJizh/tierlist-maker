@@ -49,10 +49,10 @@ export function ImageUpload(prop: ImageUploadProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" className="w-10 h-10 p-2">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex gap-2 p-2">
               <svg
                 className="w-6 h-6 text-gray-800 dark:text-white"
                 aria-hidden="true"
@@ -68,13 +68,15 @@ export function ImageUpload(prop: ImageUploadProps) {
                   clip-rule="evenodd"
                 />
               </svg>
+              <p>Add Item</p>
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Add New Item</p>
-          </TooltipContent>
-        </Tooltip>
-      </PopoverTrigger>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Add Item</p>
+        </TooltipContent>
+      </Tooltip>
+
       <PopoverContent className="w-80">
         {image === "" ? (
           <div className="grid w-full max-w-sm items-center gap-4">

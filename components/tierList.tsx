@@ -38,7 +38,13 @@ import { ImageUpload } from "./imageCropper";
 import html2canvas from "html2canvas";
 import { ModeToggle } from "./ui/modeToggleButton";
 import { DrawerTab } from "./ui/drawertab";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import { direction } from "html2canvas/dist/types/css/property-descriptors/direction";
 
 export type DNDContainer = {
   id: UniqueIdentifier;
@@ -52,61 +58,47 @@ export type DNDItem = {
   src: string;
 };
 
-const TierList = () => {
+type TierListProps = {
+  starterItems?: DNDContainer[];
+};
+
+const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
   const tierListRef = useRef(null);
   const [title, setTitle] = useState("New Tier List");
-const [isBenchVisible, setIsBenchVisible] = useState(false);
+  const [isBenchVisible, setIsBenchVisible] = useState(false);
 
-  const [containers, setContainers] = useState<DNDContainer[]>([
-    {
-      id: "container1",
-      title: "A",
-      items: [
-        { id: "1", title: "Item 1", src: "https://via.placeholder.com/150" },
-        { id: "2", title: "Item 2", src: "https://via.placeholder.com/150" },
-        { id: "3", title: "Item 3", src: "https://via.placeholder.com/150" },
-        { id: "4", title: "Item 4", src: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      id: "container2",
-      title: "B",
-      items: [
-        { id: "5", title: "Item 5", src: "https://via.placeholder.com/150" },
-        { id: "6", title: "Item 6", src: "https://via.placeholder.com/150" },
-        { id: "7", title: "Item 7", src: "https://via.placeholder.com/150" },
-        { id: "8", title: "Item 8", src: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      id: "container3",
-      title: "C",
-      items: [
-        { id: "9", title: "Item 9", src: "https://via.placeholder.com/150" },
-        { id: "10", title: "Item 10", src: "https://via.placeholder.com/150" },
-        { id: "11", title: "Item 11", src: "https://via.placeholder.com/150" },
-        { id: "12", title: "Item 12", src: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      id: "container4",
-      title: "D",
-      items: [
-        { id: "13", title: "Item 13", src: "https://via.placeholder.com/150" },
-        { id: "14", title: "Item 14", src: "https://via.placeholder.com/150" },
-        { id: "15", title: "Item 15", src: "https://via.placeholder.com/150" },
-        { id: "16", title: "Item 16", src: "https://via.placeholder.com/150" },
-      ],
-    },
-    {
-      id: "bench",
-      title: "Bench",
-      items: [],
-    },
-  ]);
+  const [containers, setContainers] = useState<DNDContainer[]>(
+    props.starterItems || [
+      {
+        id: "container1",
+        title: "A",
+        items: [],
+      },
+      {
+        id: "container2",
+        title: "B",
+        items: [],
+      },
+      {
+        id: "container3",
+        title: "C",
+        items: [],
+      },
+      {
+        id: "container4",
+        title: "D",
+        items: [],
+      },
+      {
+        id: "bench",
+        title: "Bench",
+        items: [],
+      },
+    ]
+  );
 
   useEffect(() => {
     if (parent.current && benchDrawer.current) {
@@ -115,26 +107,49 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
         : 0;
       parent.current.style.paddingBottom = `${adjustPadding}px`;
     }
-  }, [isBenchVisible]); 
+  }, [isBenchVisible]);
 
-   const toggleBenchVisibility = () => {
-     setIsBenchVisible(!isBenchVisible);
-   };
+  const toggleBenchVisibility = () => {
+    setIsBenchVisible(!isBenchVisible);
+  };
 
-  const addContainer = () => {
+  const addContainer = (id?: string, direction?: string) => {
     const benchContainerIndex = containers.findIndex(
       (container) => container.id === "bench"
     );
-    // add the new container before the bench
-    setContainers((currentItems) => [
-      ...currentItems.slice(0, benchContainerIndex),
-      {
-        id: uuidv4(),
-        title: `New Tier`,
-        items: [],
-      },
-      ...currentItems.slice(benchContainerIndex),
-    ]);
+
+    const newContainerItems = {
+      id: uuidv4(),
+      title: `New Tier`,
+      items: [],
+    };
+
+    if (direction === "above" && id) {
+      const containerIndex = containers.findIndex(
+        (container) => container.id === id
+      );
+      setContainers((currentItems) => [
+        ...currentItems.slice(0, containerIndex),
+        newContainerItems,
+        ...currentItems.slice(containerIndex),
+      ]);
+    } else if (direction === "below" && id) {
+      const containerIndex = containers.findIndex(
+        (container) => container.id === id
+      );
+      setContainers((currentItems) => [
+        ...currentItems.slice(0, containerIndex + 1),
+        newContainerItems,
+        ...currentItems.slice(containerIndex + 1),
+      ]);
+    } else {
+      // add the new container before the bench
+      setContainers((currentItems) => [
+        ...currentItems.slice(0, benchContainerIndex),
+        newContainerItems,
+        ...currentItems.slice(benchContainerIndex),
+      ]);
+    }
   };
 
   const addItem = (image: string) => {
@@ -548,6 +563,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
     // remove all setting buttons from the clone
     const settingButtons = clone.querySelectorAll(".setting-button");
     settingButtons.forEach((button) => button.remove());
+    console.log(clone);
     // Append the clone to the body to make it part of the document temporarily
     document.body.appendChild(clone);
 
@@ -558,7 +574,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = "screenshot.png";
+      link.download = `${title}.png`;
       link.click();
 
       // Clean up: remove the clone from the body
@@ -588,7 +604,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
               <Button
                 onClick={takeScreenshot}
                 variant="outline"
-                className="w-10 h-10 p-2"
+                className="flex gap-2 p-2"
               >
                 <svg
                   className="w-full h-full text-gray-800 dark:text-white"
@@ -605,10 +621,11 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
                     clip-rule="evenodd"
                   />
                 </svg>
+                <p>Save List</p>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Save The List</p>
+              <p>Save the current tierlist as image</p>
             </TooltipContent>
           </Tooltip>
 
@@ -617,7 +634,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
               <Button
                 onClick={addContainer}
                 variant="outline"
-                className="w-10 h-10 p-2"
+                className="flex gap-2 p-2"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -634,10 +651,11 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
                     clip-rule="evenodd"
                   />
                 </svg>
+                <p>Add Tier</p>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Add Tier</p>
+              <p>Add a tier to the bottom</p>
             </TooltipContent>
           </Tooltip>
 
@@ -648,7 +666,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
               <Button
                 variant="outline"
                 onClick={toggleBenchVisibility}
-                className="w-10 h-10 p-2"
+                className="flex p-2 gap-2"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -666,10 +684,11 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
                     d="M6 12h.01m6 0h.01m5.99 0h.01"
                   />
                 </svg>
+                <p>Bench</p>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Bench</p>
+              <p>Show/Hide bench</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -716,6 +735,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
                     removeContainer={removeContainer}
                     containerMoveUp={containerMoveUp}
                     containerMoveDown={containerMoveDown}
+                    addContainer={addContainer}
                   />
                 );
               })}
@@ -730,9 +750,7 @@ const [isBenchVisible, setIsBenchVisible] = useState(false);
               id="bench-drawer"
             >
               <div className="w-full flex justify-between items-center pb-4">
-                <span className="text-pretty text-xl font-bold ">
-                  Bench Items
-                </span>
+                <p className="text-pretty text-xl font-bold ">Bench</p>
                 <Button
                   onClick={() => setIsBenchVisible(false)}
                   variant="outline"

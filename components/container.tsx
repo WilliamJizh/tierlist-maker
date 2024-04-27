@@ -31,6 +31,7 @@ type ContainerProps = {
   removeContainer: (id: string) => void;
   containerMoveUp: (id: string) => void;
   containerMoveDown: (id: string) => void;
+  addContainer?:(id?: string, direction?:string) => void;
 };
 
 export default function Container(props: ContainerProps) {
@@ -85,7 +86,7 @@ export default function Container(props: ContainerProps) {
         >
           <div
             ref={setNodeRef}
-            className="flex flex-wrap gap-2 px-6 w-full content-start p-2"
+            className="flex flex-wrap gap-2 px-2 pl-4 w-full content-start p-2"
           >
             {items.map((item) => (
               <SortableItem
@@ -98,13 +99,10 @@ export default function Container(props: ContainerProps) {
           </div>
         </SortableContext>
 
-        <div className="pr-2 my-auto">
+        <div className="pr-2 my-auto setting-button">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="setting-button p-2 w-10 h-10"
-              >
+              <Button variant="outline" className=" p-2 w-10 h-10">
                 <svg
                   className="w-[40px] h-[40px] text-gray-800 dark:text-white"
                   aria-hidden="true"
@@ -134,9 +132,25 @@ export default function Container(props: ContainerProps) {
                 Down
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
+                onClick={() =>
+                  props.addContainer &&
+                  props.addContainer(id.toString(), "above")
+                }
+              >
+                Add Tier Above
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onClick={() =>
+                  props.addContainer &&
+                  props.addContainer(id.toString(), "below")
+                }
+              >
+                Add Tier Below
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
                 onClick={() => props.removeContainer(id.toString())}
               >
-                Remove
+                <p className=" text-red-600">Remove</p>
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
