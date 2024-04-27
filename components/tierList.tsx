@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+} from "react";
 import type {
   UniqueIdentifier,
   DragStartEvent,
@@ -29,7 +35,10 @@ import { v4 as uuidv4 } from "uuid";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Button } from "./ui/button";
 import { ImageUpload } from "./imageCropper";
-
+import html2canvas from "html2canvas";
+import { ModeToggle } from "./ui/modeToggleButton";
+import { DrawerTab } from "./ui/drawertab";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 export type DNDContainer = {
   id: UniqueIdentifier;
@@ -46,6 +55,11 @@ export type DNDItem = {
 const TierList = () => {
   // Maintain state for each container and the items they contain
   const [parent] = useAutoAnimate();
+  const [benchDrawer] = useAutoAnimate();
+  const tierListRef = useRef(null);
+  const [title, setTitle] = useState("New Tier List");
+const [isBenchVisible, setIsBenchVisible] = useState(false);
+
   const [containers, setContainers] = useState<DNDContainer[]>([
     {
       id: "container1",
@@ -94,10 +108,23 @@ const TierList = () => {
     },
   ]);
 
+  useEffect(() => {
+    if (parent.current && benchDrawer.current) {
+      const adjustPadding = isBenchVisible
+        ? benchDrawer.current.offsetHeight
+        : 0;
+      parent.current.style.paddingBottom = `${adjustPadding}px`;
+    }
+  }, [isBenchVisible]); 
+
+   const toggleBenchVisibility = () => {
+     setIsBenchVisible(!isBenchVisible);
+   };
+
   const addContainer = () => {
     const benchContainerIndex = containers.findIndex(
-        (container) => container.id === "bench"
-        );
+      (container) => container.id === "bench"
+    );
     // add the new container before the bench
     setContainers((currentItems) => [
       ...currentItems.slice(0, benchContainerIndex),
@@ -110,7 +137,7 @@ const TierList = () => {
     ]);
   };
 
-  const addItem = (image:string) => {
+  const addItem = (image: string) => {
     setContainers((currentItems) => {
       const containerIndex = currentItems.findIndex(
         (container) => container.id === "bench"
@@ -137,6 +164,7 @@ const TierList = () => {
 
       return newItems;
     });
+    setIsBenchVisible(true);
   };
 
   const setContainerTitle = (title: string, id: string) => {
@@ -159,7 +187,7 @@ const TierList = () => {
 
       return newItems;
     });
-  }
+  };
 
   const containerMoveUp = (id: string) => {
     const containerIndex = containers.findIndex(
@@ -177,7 +205,7 @@ const TierList = () => {
 
       return newItems;
     });
-  }
+  };
 
   const containerMoveDown = (id: string) => {
     const containerIndex = containers.findIndex(
@@ -195,13 +223,13 @@ const TierList = () => {
 
       return newItems;
     });
-  }
+  };
 
   const removeContainer = (id: string) => {
     setContainers((currentItems) => {
       return currentItems.filter((container) => container.id !== id);
     });
-  }
+  };
 
   // Use the defined sensors for drag and drop operation
   const sensors = useSensors(
@@ -224,8 +252,9 @@ const TierList = () => {
     })
   );
 
-  const [activeItemContent, setActiveItemContent] = useState<DNDItem | undefined>();
-
+  const [activeItemContent, setActiveItemContent] = useState<
+    DNDItem | undefined
+  >();
 
   // Ref to store the ID of the last container that was hovered over during a drag
   const lastOverId = useRef<UniqueIdentifier | undefined>(undefined);
@@ -266,9 +295,11 @@ const TierList = () => {
       // Store the current state of items
       itemsBeforeDrag.current = { ...containers };
       // Set the active (dragged) item id
-      const activeItem = containers.find((container) =>
-        container.items.some((item) => item.id === active.id)
-      )?.items.find((item) => item.id === active.id);
+      const activeItem = containers
+        .find((container) =>
+          container.items.some((item) => item.id === active.id)
+        )
+        ?.items.find((item) => item.id === active.id);
       setActiveItemContent(activeItem);
       console.log("activeItem", activeItem);
     },
@@ -489,67 +520,273 @@ const TierList = () => {
     });
   }, [containers]);
 
+  const takeScreenshot = () => {
+    const parent = tierListRef.current;
+    if (!parent) return;
+
+    // Create a clone of the grid to manipulate
+    const clone = parent.cloneNode(true);
+    clone.classList.add("bg-background");
+
+    // Add title element at the top of the clone
+    const titleText = document.createElement("div");
+    titleText.textContent = title; // Set the title text here
+    titleText.className = "text-center font-bold text-3xl mb-4 text-pretty"; // Tailwind classes for styling
+    clone.insertBefore(titleText, clone.firstChild); // Insert title before the first child of the clone
+
+    // Remove the 'bench' container from the clone
+    const benchContainer = clone.querySelector("#bench");
+    const benchDrawer = clone.querySelector("#bench-drawer");
+    if (benchContainer) {
+      benchContainer.remove();
+    }
+
+    if (benchDrawer) {
+      benchDrawer.remove();
+    }
+
+    // remove all setting buttons from the clone
+    const settingButtons = clone.querySelectorAll(".setting-button");
+    settingButtons.forEach((button) => button.remove());
+    // Append the clone to the body to make it part of the document temporarily
+    document.body.appendChild(clone);
+
+    // Use html2canvas to take a screenshot of the clone
+    html2canvas(clone, { scale: 1 }).then((canvas) => {
+      // You can do whatever you want with the canvas here.
+      // For example, download it as an image:
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "screenshot.png";
+      link.click();
+
+      // Clean up: remove the clone from the body
+      document.body.removeChild(clone);
+    });
+  };
+
   // Render the app, including the DnD context and all containers and items
   return (
-    <div className="p-4">
-      {/* <div className="header">
-        <h1 className="title">Drag and Drop Example</h1>
-      </div> */}
-      <DndContext
-        sensors={sensors}
-        // collisionDetection={closestCenter}
-        collisionDetection={collisionDetectionStrategy}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-        onDragCancel={onDragCancel}
-        measuring={{
-          droppable: {
-            strategy: MeasuringStrategy.Always,
-          },
-        }}
-        // When overlay is not used, items can be drag and scroll to bottom infinitely,
-        // restrictToWindowEdges can solve some the issue.
-        // However, since the draggable item is bound inside window, it will sometimes prevent
-        // dragging of tall items to top of container. Enabling this also won't
-        // solve infinite scroll on non-body container (e.g. overflow-x on a child div)
-        // modifiers={[restrictToWindowEdges]}
-      >
-        <div className="grid gap-2" ref={parent}>
-          {containers.map((container) => (
-            <Container
-              key={container.id}
-              id={container.id}
-              items={container.items}
-              title={container.title}
-              activeItemId={activeItemContent?.id.toString() || ""}
-              setTitle={setContainerTitle}
-              removeContainer={removeContainer}
-              containerMoveUp={containerMoveUp}
-              containerMoveDown={containerMoveDown}
-            />
-          ))}
+    <>
+      <TooltipProvider>
+        <div className="flex gap-2 justify-end p-2 pr-4 fixed top-0 w-full backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b z-10">
+          <div className="flex-grow items-center pl-4 inline-flex h-12">
+            <textarea
+              contentEditable="true"
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
+              className="resize-none text-wrap text-lg font-bold w-1/3 h-8 overflow-scroll bg-transparent"
+            >
+              {title}
+            </textarea>
+          </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={takeScreenshot}
+                variant="outline"
+                className="w-10 h-10 p-2"
+              >
+                <svg
+                  className="w-full h-full text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="40"
+                  height="40"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7.414A2 2 0 0 0 20.414 6L18 3.586A2 2 0 0 0 16.586 3H5Zm10 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7V5h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Save The List</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={addContainer}
+                variant="outline"
+                className="w-10 h-10 p-2"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857ZM18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Add Tier</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <ImageUpload onUpload={addItem} />
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={toggleBenchVisibility}
+                className="w-10 h-10 p-2"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    d="M6 12h.01m6 0h.01m5.99 0h.01"
+                  />
+                </svg>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Bench</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
-        {/* Use CSS.Translate.toString(transform) in `Item` style if overlay is disabled */}
-        <DragOverlay>
-          {activeItemContent ? (
-            <Item
-              id={activeItemContent.id.toString()}
-              src={activeItemContent.src}
-              isOverlay
-            />
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+        <div className="p-4 mt-16 " ref={tierListRef}>
+          {/* <div className="header">
+        <h1 className="title">Drag and Drop Example</h1>
+      </div> */}
+          <DndContext
+            sensors={sensors}
+            // collisionDetection={closestCenter}
+            collisionDetection={collisionDetectionStrategy}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={onDragCancel}
+            measuring={{
+              droppable: {
+                strategy: MeasuringStrategy.Always,
+              },
+            }}
+            // When overlay is not used, items can be drag and scroll to bottom infinitely,
+            // restrictToWindowEdges can solve some the issue.
+            // However, since the draggable item is bound inside window, it will sometimes prevent
+            // dragging of tall items to top of container. Enabling this also won't
+            // solve infinite scroll on non-body container (e.g. overflow-x on a child div)
+            // modifiers={[restrictToWindowEdges]}
+          >
+            {/* Main content that moves based on drawer visibility */}
+            <div
+              className={`grid gap-2${isBenchVisible ? " mb-56" : ""}`}
+              ref={parent}
+            >
+              {containers.map((container) => {
+                if (container.id === "bench") return null;
+                return (
+                  <Container
+                    key={container.id}
+                    id={container.id}
+                    items={container.items}
+                    title={container.title}
+                    activeItemId={activeItemContent?.id.toString() || ""}
+                    setTitle={setContainerTitle}
+                    removeContainer={removeContainer}
+                    containerMoveUp={containerMoveUp}
+                    containerMoveDown={containerMoveDown}
+                  />
+                );
+              })}
+            </div>
 
-      <div className="flex w-full justify-center gap-2 p-4">
-        <Button onClick={addContainer} variant="outline">
-          Add Container
-        </Button>
-        <ImageUpload onUpload={addItem} />
-      </div>
-    </div>
+            {/* Drawer that pushes content */}
+            <div
+              ref={benchDrawer}
+              className={`fixed border-t bottom-0 left-0 w-full p-4 pt-3 z-50 bg-background  transition-transform, duration-150 transform ${
+                isBenchVisible ? "translate-y-0" : "translate-y-full"
+              }`}
+              id="bench-drawer"
+            >
+              <div className="w-full flex justify-between items-center pb-4">
+                <span className="text-pretty text-xl font-bold ">
+                  Bench Items
+                </span>
+                <Button
+                  onClick={() => setIsBenchVisible(false)}
+                  variant="outline"
+                  className="px-2 w-10 h-10"
+                >
+                  <svg
+                    className="text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      d="M6 18L17.94 6M18 18L6.06 6"
+                    />
+                  </svg>
+                </Button>
+              </div>
+              <Container
+                key={"bench"}
+                id={"bench"}
+                items={
+                  containers.find((container) => container.id === "bench")
+                    ?.items || []
+                }
+                title={"Bench"}
+                activeItemId={activeItemContent?.id.toString() || ""}
+                setTitle={setContainerTitle}
+                removeContainer={removeContainer}
+                containerMoveUp={containerMoveUp}
+                containerMoveDown={containerMoveDown}
+              />
+            </div>
+
+            {/* Use CSS.Translate.toString(transform) in `Item` style if overlay is disabled */}
+            <DragOverlay>
+              {activeItemContent ? (
+                <Item
+                  id={activeItemContent.id.toString()}
+                  src={activeItemContent.src}
+                  isOverlay
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+      </TooltipProvider>
+    </>
   );
 };
 

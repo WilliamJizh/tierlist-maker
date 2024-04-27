@@ -1,7 +1,6 @@
 'use client'
 import { ImageUpload } from "@/components/imageCropper";
 import TierList from "@/components/tierList";
-import { ModeToggle } from "@/components/ui/modeToggleButton";
 import { ThemeProvider } from "next-themes";
 
 const Page = () => {
@@ -9,11 +8,11 @@ const Page = () => {
     <div>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="dark"
         enableSystem
         disableTransitionOnChange
       >
-        <ModeToggle />
+        
         <TierList />
       </ThemeProvider>
     </div>
