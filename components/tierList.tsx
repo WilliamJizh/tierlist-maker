@@ -27,6 +27,8 @@ import Container from "@/components/container";
 import { Item } from "@/components/sortableItem";
 import { v4 as uuidv4 } from "uuid";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { Button } from "./ui/button";
+import { ImageUpload } from "./imageCropper";
 
 
 export type DNDContainer = {
@@ -47,7 +49,7 @@ const TierList = () => {
   const [containers, setContainers] = useState<DNDContainer[]>([
     {
       id: "container1",
-      title: "Container 1",
+      title: "A",
       items: [
         { id: "1", title: "Item 1", src: "https://via.placeholder.com/150" },
         { id: "2", title: "Item 2", src: "https://via.placeholder.com/150" },
@@ -57,7 +59,7 @@ const TierList = () => {
     },
     {
       id: "container2",
-      title: "Container 2",
+      title: "B",
       items: [
         { id: "5", title: "Item 5", src: "https://via.placeholder.com/150" },
         { id: "6", title: "Item 6", src: "https://via.placeholder.com/150" },
@@ -67,7 +69,7 @@ const TierList = () => {
     },
     {
       id: "container3",
-      title: "Container 3",
+      title: "C",
       items: [
         { id: "9", title: "Item 9", src: "https://via.placeholder.com/150" },
         { id: "10", title: "Item 10", src: "https://via.placeholder.com/150" },
@@ -77,7 +79,7 @@ const TierList = () => {
     },
     {
       id: "container4",
-      title: "Container 4",
+      title: "D",
       items: [
         { id: "13", title: "Item 13", src: "https://via.placeholder.com/150" },
         { id: "14", title: "Item 14", src: "https://via.placeholder.com/150" },
@@ -101,14 +103,14 @@ const TierList = () => {
       ...currentItems.slice(0, benchContainerIndex),
       {
         id: uuidv4(),
-        title: `Container ${currentItems.length + 1}`,
+        title: `New Tier`,
         items: [],
       },
       ...currentItems.slice(benchContainerIndex),
     ]);
   };
 
-  const addItem = () => {
+  const addItem = (image:string) => {
     setContainers((currentItems) => {
       const containerIndex = currentItems.findIndex(
         (container) => container.id === "bench"
@@ -128,7 +130,7 @@ const TierList = () => {
           {
             id: uuidv4(),
             title: `Item ${container.items.length + 1}`,
-            src: "https://via.placeholder.com/150",
+            src: image,
           },
         ],
       };
@@ -490,9 +492,9 @@ const TierList = () => {
   // Render the app, including the DnD context and all containers and items
   return (
     <div className="p-4">
-      <div className="header">
+      {/* <div className="header">
         <h1 className="title">Drag and Drop Example</h1>
-      </div>
+      </div> */}
       <DndContext
         sensors={sensors}
         // collisionDetection={closestCenter}
@@ -541,8 +543,12 @@ const TierList = () => {
         </DragOverlay>
       </DndContext>
 
-      <button onClick={addContainer}>Add Container</button>
-      <button onClick={addItem}>Add Item</button>
+      <div className="flex w-full justify-center gap-2 p-4">
+        <Button onClick={addContainer} variant="outline">
+          Add Container
+        </Button>
+        <ImageUpload onUpload={addItem} />
+      </div>
     </div>
   );
 };
