@@ -66,7 +66,7 @@ const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
-  const tierListRef = useRef(null);
+  const tierListRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState("New Tier List");
   const [isBenchVisible, setIsBenchVisible] = useState(false);
 
@@ -99,15 +99,6 @@ const TierList = (props: TierListProps) => {
       },
     ]
   );
-
-  useEffect(() => {
-    if (parent.current && benchDrawer.current) {
-      const adjustPadding = isBenchVisible
-        ? benchDrawer.current.offsetHeight
-        : 0;
-      parent.current.style.paddingBottom = `${adjustPadding}px`;
-    }
-  }, [isBenchVisible]);
 
   const toggleBenchVisibility = () => {
     setIsBenchVisible(!isBenchVisible);
@@ -332,7 +323,7 @@ const TierList = (props: TierListProps) => {
       const activeId = active.id;
       const overId = over.id;
 
-      const findContainer = (id) => {
+      const findContainer = (id:string) => {
         // if the id is a container id itself
         const container = containers.find((item) => item.id === id);
         if (container) return container;
@@ -342,8 +333,8 @@ const TierList = (props: TierListProps) => {
         );
       };
 
-      const activeContainer = findContainer(activeId);
-      const overContainer = findContainer(overId);
+      const activeContainer = findContainer(activeId.toString());
+      const overContainer = findContainer(overId.toString());
       console.log("activeContainer", activeContainer);
       console.log("overContainer", overContainer);
 
@@ -373,6 +364,7 @@ const TierList = (props: TierListProps) => {
             const activeItem = activeContainer.items.find(
               (item) => item.id === activeId
             );
+            if(!activeItem) return container;
             console.log("activeItem", activeItem);
             const overItemIndex = container.items.findIndex(
               (item) => item.id === overId
@@ -403,7 +395,7 @@ const TierList = (props: TierListProps) => {
 
   // Function called when a drag operation ends
   const handleDragEnd = useCallback(
-    ({ active, over }) => {
+    ({ active, over }: { active: any, over: any }) => {
       if (!over) {
         setActiveItemContent(undefined);
         return;
@@ -540,7 +532,7 @@ const TierList = (props: TierListProps) => {
     if (!parent) return;
 
     // Create a clone of the grid to manipulate
-    const clone = parent.cloneNode(true);
+    const clone: HTMLElement = parent.cloneNode(true) as HTMLElement;
     clone.classList.add("bg-background");
 
     // Add title element at the top of the clone
@@ -632,7 +624,7 @@ const TierList = (props: TierListProps) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                onClick={addContainer}
+                onClick={() => addContainer()}
                 variant="outline"
                 className="flex gap-2 p-2"
               >

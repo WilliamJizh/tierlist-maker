@@ -72,7 +72,7 @@ export default function Container(props: ContainerProps) {
                 }
               }}
               contentEditable="true"
-              onChange={(e) => setTitle(e.target.value, id.toString())}
+              onChange={(e) => setTitle((e.target as HTMLInputElement).value, id.toString())}
               className="resize-none text-wrap text-lg w-full text-center"
             >
               {title}
