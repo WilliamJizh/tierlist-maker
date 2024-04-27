@@ -560,7 +560,7 @@ const TierList = (props: TierListProps) => {
     document.body.appendChild(clone);
 
     // Use html2canvas to take a screenshot of the clone
-    html2canvas(clone, { scale: 1 }).then((canvas) => {
+    html2canvas(clone, { scale: 5 }).then((canvas) => {
       // You can do whatever you want with the canvas here.
       // For example, download it as an image:
       const image = canvas.toDataURL("image/png");
