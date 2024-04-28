@@ -1,7 +1,4 @@
-import { ThemeProvider } from "@/components/theme-provider";
 import TierList from "@/components/tierList";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function Home() {
   return (
@@ -18,13 +15,7 @@ export default function Home() {
     //     </Button>
     //   </main>
     // </ThemeProvider>
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <TierList />
-    </ThemeProvider>
+
+    <TierList />
   );
 }
