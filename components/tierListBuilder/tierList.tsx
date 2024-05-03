@@ -29,22 +29,29 @@ import {
   getFirstCollision,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import Container from "@/components/container";
-import { Item } from "@/components/sortableItem";
+import Container from "@/components/tierListBuilder/container";
+import { Item } from "@/components/tierListBuilder/sortableItem";
 import { v4 as uuidv4 } from "uuid";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { ImageUpload } from "./imageCropper";
 import html2canvas from "html2canvas";
-import { ModeToggle } from "./ui/modeToggleButton";
-import { DrawerTab } from "./ui/drawertab";
+import { ModeToggle } from "../ui/modeToggleButton";
+import { DrawerTab } from "../ui/drawertab";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
+} from "../ui/tooltip";
 import { direction } from "html2canvas/dist/types/css/property-descriptors/direction";
+import { imageUpload } from "@/components/tierListBuilder/imageUpload";
+import { TitleDialog } from "./titleEdit";
+import { PublishTierList } from "./tierListPublish";
+import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { toast } from "../ui/use-toast";
+import { is } from "drizzle-orm";
 
 export type DNDContainer = {
   id: UniqueIdentifier;
@@ -59,6 +66,7 @@ export type DNDItem = {
 };
 
 type TierListProps = {
+  title?: string;
   starterItems?: DNDContainer[];
 };
 
@@ -67,7 +75,7 @@ const TierList = (props: TierListProps) => {
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
   const tierListRef = useRef<HTMLDivElement>(null);
-  const [title, setTitle] = useState("New Tier List");
+  const [title, setTitle] = useState(props.title || "New Tier List");
   const [isBenchVisible, setIsBenchVisible] = useState(false);
 
   const [containers, setContainers] = useState<DNDContainer[]>(
@@ -99,6 +107,8 @@ const TierList = (props: TierListProps) => {
       },
     ]
   );
+
+  const router = useRouter();
 
   const toggleBenchVisibility = () => {
     setIsBenchVisible(!isBenchVisible);
@@ -171,6 +181,17 @@ const TierList = (props: TierListProps) => {
       return newItems;
     });
     setIsBenchVisible(true);
+  };
+
+  const removeItem = (id: string) => {
+    setContainers((currentItems) => {
+      return currentItems.map((container) => {
+        return {
+          ...container,
+          items: container.items.filter((item) => item.id !== id),
+        };
+      });
+    });
   };
 
   const setContainerTitle = (title: string, id: string) => {
@@ -307,7 +328,6 @@ const TierList = (props: TierListProps) => {
         )
         ?.items.find((item) => item.id === active.id);
       setActiveItemContent(activeItem);
-      console.log("activeItem", activeItem);
     },
     [containers]
   );
@@ -315,7 +335,6 @@ const TierList = (props: TierListProps) => {
   // Function called when an item is dragged over another container
   const handleDragOver = useCallback(
     ({ active, over }: DragOverEvent) => {
-      console.log("over", over);
       if (!over || containers.some((container) => container.id === active.id)) {
         return;
       }
@@ -323,7 +342,7 @@ const TierList = (props: TierListProps) => {
       const activeId = active.id;
       const overId = over.id;
 
-      const findContainer = (id:string) => {
+      const findContainer = (id: string) => {
         // if the id is a container id itself
         const container = containers.find((item) => item.id === id);
         if (container) return container;
@@ -335,15 +354,12 @@ const TierList = (props: TierListProps) => {
 
       const activeContainer = findContainer(activeId.toString());
       const overContainer = findContainer(overId.toString());
-      console.log("activeContainer", activeContainer);
-      console.log("overContainer", overContainer);
 
       if (
         !overContainer ||
         !activeContainer ||
         activeContainer.id === overContainer.id
       ) {
-        console.log("return");
         return;
       }
 
@@ -356,20 +372,16 @@ const TierList = (props: TierListProps) => {
               items: container.items.filter((item) => item.id !== activeId),
             };
           }
-          console.log("container.id", container.id);
-          console.log("overContainer.id", overContainer.id);
+
           if (container.id === overContainer.id) {
-            console.log("container.id === overContainer.id");
             // Add the item to the new container
             const activeItem = activeContainer.items.find(
               (item) => item.id === activeId
             );
-            if(!activeItem) return container;
-            console.log("activeItem", activeItem);
+            if (!activeItem) return container;
             const overItemIndex = container.items.findIndex(
               (item) => item.id === overId
             );
-            console.log("overItemIndex", overItemIndex);
             let newContainerItems = [...container.items];
 
             if (overItemIndex >= 0) {
@@ -395,7 +407,7 @@ const TierList = (props: TierListProps) => {
 
   // Function called when a drag operation ends
   const handleDragEnd = useCallback(
-    ({ active, over }: { active: any, over: any }) => {
+    ({ active, over }: { active: any; over: any }) => {
       if (!over) {
         setActiveItemContent(undefined);
         return;
@@ -527,13 +539,22 @@ const TierList = (props: TierListProps) => {
     });
   }, [containers]);
 
-  const takeScreenshot = () => {
+  const createScreenShotHTML = () => {
     const parent = tierListRef.current;
     if (!parent) return;
 
     // Create a clone of the grid to manipulate
     const clone: HTMLElement = parent.cloneNode(true) as HTMLElement;
     clone.classList.add("bg-background");
+    clone.classList.add("h-fit");
+    
+
+    // Add styles to keep the clone invisible
+    clone.style.position = "absolute";
+    clone.style.left = "-9999px"; // Move the clone far off-screen
+    clone.style.top = "-9999px";
+
+    clone.style.width = "1200px"; // Set the width
 
     // Add title element at the top of the clone
     const titleText = document.createElement("div");
@@ -552,68 +573,119 @@ const TierList = (props: TierListProps) => {
       benchDrawer.remove();
     }
 
+    //remove extra bottom paddings
+    if (isBenchVisible){
+      const parentBackground = clone.querySelector(".parent-background");
+      parentBackground?.classList.remove("mb-56");
+    }
+
     // remove all setting buttons from the clone
     const settingButtons = clone.querySelectorAll(".setting-button");
     settingButtons.forEach((button) => button.remove());
-    console.log(clone);
+
+    return clone;
+  };
+
+  const takeScreenshot = () => {
+    const clone = createScreenShotHTML();
+    if (!clone) {
+      alert("Failed to take screenshot");
+      return;
+    }
     // Append the clone to the body to make it part of the document temporarily
     document.body.appendChild(clone);
 
     // Use html2canvas to take a screenshot of the clone
-    html2canvas(clone, { scale: 5 }).then((canvas) => {
-      // You can do whatever you want with the canvas here.
-      // For example, download it as an image:
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `${title}.png`;
-      link.click();
+    html2canvas(clone, { scale: 5, height: clone.offsetHeight - 1 }).then(
+      (canvas) => {
+        // You can do whatever you want with the canvas here.
+        // For example, download it as an image:
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `${title}.png`;
+        link.click();
 
-      // Clean up: remove the clone from the body
-      document.body.removeChild(clone);
+        // Clean up: remove the clone from the body
+        document.body.removeChild(clone);
+      }
+    );
+  };
+
+  const generateScreenshotImage = async () => {
+    const clone = createScreenShotHTML();
+    if (!clone) {
+      toast({
+        title: "Failed to take screenshot",
+        description: "Please try again.",
+      })
+      return "";
+    }
+    // Append the clone to the body to make it part of the document temporarily
+    document.body.appendChild(clone);
+
+    // Use html2canvas to take a screenshot of the clone
+    const canvas = await html2canvas(clone, {
+      scale: 1,
+      height: clone.offsetHeight - 1,
     });
+
+    // Clean up: remove the clone from the body
+    document.body.removeChild(clone);
+
+    return canvas.toDataURL("image/png", 0.5);
+  };
+
+  const handleHomeClick = () => {
+    // navigate to home
+    router.prefetch("/");
+    router.push("/");
   };
 
   // Render the app, including the DnD context and all containers and items
   return (
     <>
       <TooltipProvider>
-        <div className="flex gap-2 justify-end p-2 pr-4 fixed top-0 w-full backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b z-10">
-          <div className="flex-grow items-center pl-4 inline-flex h-12">
-            <textarea
-              contentEditable="true"
-              onChange={(e) => {
-                setTitle(e.target.value);
-              }}
-              className="resize-none text-wrap text-lg font-bold w-1/3 h-8 overflow-scroll bg-transparent"
+        <div className="flex gap-2 items-center justify-end p-2 py-4 pr-4 sticky top-0 z-40 w-full min-w-max backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b ">
+          <div className="flex-grow  gap-2 items-center pl-4 inline-flex">
+            <Button
+              onClick={handleHomeClick}
+              variant="outline"
+              className="w-10 h-10 flex p-2"
             >
+              <svg
+                className="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m15 19-7-7 7-7"
+                />
+              </svg>
+            </Button>
+            <p className=" font-bold text-xl max-w-64 max-h-12 overflow-x-auto">
               {title}
-            </textarea>
+            </p>
+            <TitleDialog submitTitle={setTitle} title={title} />
+            <PublishTierList
+              title={title}
+              content={containers}
+              getTierlistCoverImage={generateScreenshotImage}
+            />
           </div>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                onClick={takeScreenshot}
-                variant="outline"
-                className="flex gap-2 p-2"
-              >
-                <svg
-                  className="w-full h-full text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="40"
-                  height="40"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7.414A2 2 0 0 0 20.414 6L18 3.586A2 2 0 0 0 16.586 3H5Zm10 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7V5h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <p>Save List</p>
+              <Button onClick={takeScreenshot} variant="outline">
+                <p>Save To Image</p>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -623,27 +695,8 @@ const TierList = (props: TierListProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                onClick={() => addContainer()}
-                variant="outline"
-                className="flex gap-2 p-2"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857ZM18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <p>Add Tier</p>
+              <Button onClick={() => addContainer()} variant="outline">
+                <p>New Tier</p>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -655,27 +708,7 @@ const TierList = (props: TierListProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                onClick={toggleBenchVisibility}
-                className="flex p-2 gap-2"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-width="4"
-                    d="M6 12h.01m6 0h.01m5.99 0h.01"
-                  />
-                </svg>
+              <Button variant="outline" onClick={toggleBenchVisibility}>
                 <p>Bench</p>
               </Button>
             </TooltipTrigger>
@@ -685,7 +718,7 @@ const TierList = (props: TierListProps) => {
           </Tooltip>
         </div>
 
-        <div className="p-4 mt-16 " ref={tierListRef}>
+        <div className="p-4 " ref={tierListRef}>
           {/* <div className="header">
         <h1 className="title">Drag and Drop Example</h1>
       </div> */}
@@ -711,7 +744,7 @@ const TierList = (props: TierListProps) => {
           >
             {/* Main content that moves based on drawer visibility */}
             <div
-              className={`grid gap-2${isBenchVisible ? " mb-56" : ""}`}
+              className={`parent-background grid gap-2${isBenchVisible ? " mb-56" : ""}`}
               ref={parent}
             >
               {containers.map((container) => {
@@ -728,6 +761,7 @@ const TierList = (props: TierListProps) => {
                     containerMoveUp={containerMoveUp}
                     containerMoveDown={containerMoveDown}
                     addContainer={addContainer}
+                    onRemoveItem={removeItem}
                   />
                 );
               })}
@@ -780,6 +814,7 @@ const TierList = (props: TierListProps) => {
                 removeContainer={removeContainer}
                 containerMoveUp={containerMoveUp}
                 containerMoveDown={containerMoveDown}
+                onRemoveItem={removeItem}
               />
             </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 
-import { addUser } from "@/drizzle/actions";
+import { addUser } from "@/server/userActions";
 import { Button } from "../ui/button";
 
 

@@ -10,13 +10,52 @@ type ItemProps = {
   isOverlay?: boolean;
   isDragging?: boolean;
   activeItemId?: string;
+  isBenched?: boolean;
+  onRemove?: (id: string) => void;
 };
 
 export function Item(props: ItemProps) {
+  const handleRemove = () => {
+    console.log("remove", props.id);
+    console.log("props", props);
+    if (props.onRemove) {
+      props.onRemove(props.id);
+    }
+  };
+
   if (props.activeItemId === props.id) {
     return (
       <div className=" opacity-10">
         <Image src={props.src} alt={props.id} width={100} height={100} />
+      </div>
+    );
+  }
+  if (props.isBenched) {
+    return (
+      <div className="relative">
+        <Image src={props.src} alt={props.id} width={100} height={100} />
+        <button
+          onClick={handleRemove}
+          className="absolute flex -top-1.5 -right-1.5 w-6 h-6 bg-white border border-black rounded-full items-center justify-center shadow-md"
+        >
+          <svg
+            className="w-4 h-4 text-gray-800 dark:text-black"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18 17.94 6M18 18 6.06 6"
+            />
+          </svg>
+        </button>
       </div>
     );
   }
@@ -31,6 +70,8 @@ type SortableItemProps = {
   id: string;
   src: string;
   activeItemId: string;
+  isBenched?: boolean;
+  onRemove?: (id: string) => void;
 };
 
 export default function SortableItem(props: SortableItemProps) {
@@ -55,6 +96,8 @@ export default function SortableItem(props: SortableItemProps) {
         src={props.src}
         isDragging={isDragging}
         activeItemId={props.activeItemId}
+        isBenched={props.isBenched}
+        onRemove={props.onRemove}
       />
     </div>
   );

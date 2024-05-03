@@ -7,9 +7,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortableItem from "./sortableItem";
-import { DNDItem } from "@/components/tierList";
-import { Button } from "./ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { DNDItem } from "@/components/tierListBuilder/tierList";
+import { Button } from "../ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 import {
   DropdownMenu,
@@ -32,6 +32,7 @@ type ContainerProps = {
   containerMoveUp: (id: string) => void;
   containerMoveDown: (id: string) => void;
   addContainer?:(id?: string, direction?:string) => void;
+  onRemoveItem?: (id: string) => void;
 };
 
 export default function Container(props: ContainerProps) {
@@ -41,12 +42,13 @@ export default function Container(props: ContainerProps) {
     id,
   });
 
+
   if (id === "bench") {
     return (
       <div
         ref={setNodeRef}
         id="bench"
-        className=" flex bg-background border border-zinc-300 rounded-lg gap-2 p-4  flex-wrap min-h-36  max-h-64 overflow-scroll"
+        className=" flex bg-background border border-zinc-300 rounded-lg gap-2 p-4  flex-wrap min-h-36  max-h-64 overflow-auto"
       >
         {items.map((item) => (
           <SortableItem
@@ -54,6 +56,8 @@ export default function Container(props: ContainerProps) {
             id={item.id.toString()}
             src={item.src}
             activeItemId={activeItemId}
+            isBenched={true}
+            onRemove={props.onRemoveItem}
           />
         ))}
       </div>
@@ -66,13 +70,16 @@ export default function Container(props: ContainerProps) {
         <CardTitle>
           <div className="flex justify-center items-center w-24 m-auto h-full flex-wrap border-r p-2">
             <div
+              suppressContentEditableWarning
+              contentEditable
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault(); // Prevent the Enter key from creating a new line
                 }
               }}
-              contentEditable="true"
-              onChange={(e) => setTitle((e.target as HTMLInputElement).value, id.toString())}
+              onChange={(e) =>
+                setTitle((e.target as HTMLInputElement).value, id.toString())
+              }
               className="resize-none text-wrap text-lg w-full text-center"
             >
               {title}
@@ -113,9 +120,9 @@ export default function Container(props: ContainerProps) {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M9.586 2.586A2 2 0 0 1 11 2h2a2 2 0 0 1 2 2v.089l.473.196.063-.063a2.002 2.002 0 0 1 2.828 0l1.414 1.414a2 2 0 0 1 0 2.827l-.063.064.196.473H20a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.089l-.196.473.063.063a2.002 2.002 0 0 1 0 2.828l-1.414 1.414a2 2 0 0 1-2.828 0l-.063-.063-.473.196V20a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.089l-.473-.196-.063.063a2.002 2.002 0 0 1-2.828 0l-1.414-1.414a2 2 0 0 1 0-2.827l.063-.064L4.089 15H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09l.195-.473-.063-.063a2 2 0 0 1 0-2.828l1.414-1.414a2 2 0 0 1 2.827 0l.064.063L9 4.089V4a2 2 0 0 1 .586-1.414ZM8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
               </Button>

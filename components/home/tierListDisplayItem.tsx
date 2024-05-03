@@ -1,0 +1,74 @@
+import { ListTierListsByPaginationResponse } from "@/server/tierListActions";
+import Image from "next/image";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Card, CardDescription, CardTitle } from "../ui/card";
+
+const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
+  const componentType = typeof window === "undefined" ? "server" : "client";
+  const fallbackSrc = "/fallback.jpg";
+  const coverImage =
+    item.coverImage && item.coverImage !== "" ? item.coverImage : fallbackSrc;
+
+  console.log("coverImage", coverImage);
+
+  return (
+    <Card className=" max-w-xl">
+      <Link
+        className="grid p-4 gap-4 m-auto cursor-pointer"
+        href={`/tierlist/${item.id}`}
+      >
+        <div className="flex items-end gap-2 pb-4 border-b">
+          <Avatar>
+            <AvatarImage src={item.user?.image || ""} alt="@shadcn" />
+            <AvatarFallback>{item.user?.name || "G"}</AvatarFallback>
+          </Avatar>
+          <div className="grid ">
+            <p className="font-bold">{item.user?.name || "Guest"}</p>
+            <p className="text-sm">
+              {`${item.createdAt.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+              })} at ${item.createdAt.toLocaleTimeString(undefined, {
+                hour: "numeric",
+                minute: "numeric",
+              })}`}
+            </p>
+          </div>
+        </div>
+        {componentType === "server" ? (
+          <Image
+            src={coverImage}
+            alt=""
+            width={600}
+            height={0}
+            className="w-full rounded border-2 max-h-[800px] h-auto w-600 object-cover"
+          />
+        ) : (
+          <Image
+            src={coverImage}
+            alt=""
+            width={600}
+            height={0}
+            data-loaded="false"
+            onLoad={(event) => {
+              event.currentTarget.setAttribute("data-loaded", "true");
+            }}
+            className="w-full data-[loaded=false]:animate-pulse data-[loaded=false]:bg-gray-100/10 rounded border-2 max-h-[600px] h-auto w-800 object-cover"
+          />
+        )}
+
+        <div className="flex flex-col pb-4">
+          <CardTitle>{item.title}</CardTitle>
+          {item.description && item.description !== "" && (
+            <CardDescription className="pt-2">
+              {item.description}
+            </CardDescription>
+          )}
+        </div>
+      </Link>
+    </Card>
+  );
+};
+
+export default TierListDisplayItem;

@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "./db";
-import * as schema from "./schema";
+import { db } from "../drizzle/db";
+import * as schema from "../drizzle/schema";
 
 export const getUsers = async () => {
   return db.query.UsersTable.findMany();
