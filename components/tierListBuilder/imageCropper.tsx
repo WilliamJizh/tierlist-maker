@@ -49,7 +49,13 @@ export function ImageUpload(prop: ImageUploadProps) {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(change) => {
+        setOpen(change);
+        onClear();
+      }}
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
@@ -86,9 +92,8 @@ export function ImageUpload(prop: ImageUploadProps) {
           />
         )}
         {image && (
-          <div className="flex w-full justify-center pt-4 gap-2">
+          <div className="flex w-full justify-center gap-2 pt-4">
             <Button onClick={onConfirm}>Confirm</Button>
-            <Button onClick={onClear}>Cancel</Button>
           </div>
         )}
       </PopoverContent>
