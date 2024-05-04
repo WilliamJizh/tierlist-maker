@@ -1,9 +1,15 @@
 "use client";
-import TierList from "@/components/tierListBuilder/tierList";
+import TierList, { DNDContainer } from "@/components/tierListBuilder/tierList";
+import { useEffect, useState } from "react";
 
 export default function Page() {
-  const tierListContent = localStorage?.getItem("tierListContent");
-  const title = localStorage?.getItem("tierListTitle");
+  const [tierListContent, setTierListContent] = useState<string | null>("");
+  const [title, setTitle] = useState<string | null>("");
+
+  useEffect(() => {
+    setTierListContent(localStorage?.getItem("tierListContent"));
+    setTitle(localStorage?.getItem("title"));
+  }, []);
 
   if (!tierListContent || !title) {
     return (
@@ -14,7 +20,6 @@ export default function Page() {
   }
 
   const tierlist = JSON.parse(tierListContent);
-
 
   return (
     <div>
