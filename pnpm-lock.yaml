@@ -53,6 +53,9 @@ dependencies:
   '@uploadthing/react':
     specifier: ^6.5.1
     version: 6.5.1(next@14.2.2)(react@18.3.1)(uploadthing@6.10.1)
+  '@vercel/analytics':
+    specifier: ^1.2.2
+    version: 1.2.2(next@14.2.2)(react@18.3.1)
   '@vercel/blob':
     specifier: ^0.23.2
     version: 0.23.2
@@ -1766,6 +1769,22 @@ packages:
       effect: 3.1.2
       fast-check: 3.18.0
       std-env: 3.7.0
+    dev: false
+
+  /@vercel/analytics@1.2.2(next@14.2.2)(react@18.3.1):
+    resolution: {integrity: sha512-X0rctVWkQV1e5Y300ehVNqpOfSOufo7ieA5PIdna8yX/U7Vjz0GFsGf4qvAhxV02uQ2CVt7GYcrFfddXXK2Y4A==}
+    peerDependencies:
+      next: '>= 13'
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      next:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      next: 14.2.2(react-dom@18.3.1)(react@18.3.1)
+      react: 18.3.1
+      server-only: 0.0.1
     dev: false
 
   /@vercel/blob@0.23.2:
@@ -4495,6 +4514,10 @@ packages:
     dependencies:
       lru-cache: 6.0.0
     dev: true
+
+  /server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+    dev: false
 
   /set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
