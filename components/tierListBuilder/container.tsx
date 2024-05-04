@@ -20,8 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
-
 type ContainerProps = {
   id: UniqueIdentifier;
   title: string;
@@ -31,7 +29,7 @@ type ContainerProps = {
   removeContainer: (id: string) => void;
   containerMoveUp: (id: string) => void;
   containerMoveDown: (id: string) => void;
-  addContainer?:(id?: string, direction?:string) => void;
+  addContainer?: (id?: string, direction?: string) => void;
   onRemoveItem?: (id: string) => void;
 };
 
@@ -42,13 +40,12 @@ export default function Container(props: ContainerProps) {
     id,
   });
 
-
   if (id === "bench") {
     return (
       <div
         ref={setNodeRef}
         id="bench"
-        className=" flex bg-background border border-zinc-300 rounded-lg gap-2 p-4  flex-wrap min-h-36  max-h-64 overflow-auto"
+        className=" flex max-h-64 min-h-36 flex-wrap gap-2 overflow-auto rounded-lg  border border-zinc-300  bg-background p-4"
       >
         {items.map((item) => (
           <SortableItem
@@ -68,7 +65,7 @@ export default function Container(props: ContainerProps) {
     <Card>
       <div className="flex min-h-[116px]">
         <CardTitle>
-          <div className="flex justify-center items-center w-24 m-auto h-full flex-wrap border-r p-2">
+          <div className="m-auto flex h-full w-24 flex-wrap items-center justify-center border-r p-2">
             <div
               suppressContentEditableWarning
               contentEditable
@@ -80,7 +77,7 @@ export default function Container(props: ContainerProps) {
               onChange={(e) =>
                 setTitle((e.target as HTMLInputElement).value, id.toString())
               }
-              className="resize-none text-wrap text-lg w-full text-center"
+              className="w-full resize-none text-wrap text-center text-lg"
             >
               {title}
             </div>
@@ -93,7 +90,7 @@ export default function Container(props: ContainerProps) {
         >
           <div
             ref={setNodeRef}
-            className="flex flex-wrap gap-2 px-2 pl-4 w-full content-start p-2"
+            className="flex w-full flex-wrap content-start gap-2 p-2 px-2 pl-4"
           >
             {items.map((item) => (
               <SortableItem
@@ -106,12 +103,12 @@ export default function Container(props: ContainerProps) {
           </div>
         </SortableContext>
 
-        <div className="pr-2 my-auto setting-button">
+        <div className="setting-button my-auto pr-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" p-2 w-10 h-10">
+              <Button variant="outline" className=" h-10 w-10 p-2">
                 <svg
-                  className="w-[40px] h-[40px] text-gray-800 dark:text-white"
+                  className="h-[40px] w-[40px] text-gray-800 dark:text-white"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"

@@ -48,6 +48,40 @@ export function ImageUpload(prop: ImageUploadProps) {
     setImage("");
   };
 
+  const cropToSquare = async (base64Image: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const size = Math.min(img.width, img.height);
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject("Failed to get canvas context");
+          return;
+        }
+
+        // Calculating the top left corner coordinates to center the crop area
+        const x = (img.width - size) / 2;
+        const y = (img.height - size) / 2;
+
+        ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
+        resolve(canvas.toDataURL()); // Converts the canvas to base64
+      };
+      img.onerror = reject;
+      img.src = base64Image;
+    });
+  };
+
+  const batchUpload = async (images: string[]) => {
+    for (const image of images) {
+      const croppedImage = await cropToSquare(image);
+      prop.onUpload(croppedImage);
+    }
+    setOpen(false);
+  };
+
   return (
     <Popover
       open={open}
@@ -73,12 +107,36 @@ export function ImageUpload(prop: ImageUploadProps) {
         {image === "" ? (
           <div className="grid w-full max-w-sm items-center gap-4 pb-4">
             <Label htmlFor="picture">Upload</Label>
+            <p>Upload A Single Image</p>
             <Input
               id="picture"
               type="file"
               name="image"
               accept="image/*"
               onChange={onFileChange}
+            />
+            <p>Upload Multiple Images</p>
+            <Input
+              id="pictures"
+              type="file"
+              name="images"
+              accept="image/*"
+              multiple
+              onChange={(event) => {
+                if (event.target.files && event.target.files.length > 0) {
+                  const images: string[] = [];
+                  for (let i = 0; i < event.target.files.length; i++) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      images.push(reader.result as string);
+                      if (images.length === event.target.files?.length) {
+                        batchUpload(images);
+                      }
+                    };
+                    reader.readAsDataURL(event.target.files[i]);
+                  }
+                }
+              }}
             />
           </div>
         ) : (
