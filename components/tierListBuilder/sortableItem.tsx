@@ -16,8 +16,6 @@ type ItemProps = {
 
 export function Item(props: ItemProps) {
   const handleRemove = () => {
-    console.log("remove", props.id);
-    console.log("props", props);
     if (props.onRemove) {
       props.onRemove(props.id);
     }

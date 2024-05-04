@@ -59,8 +59,8 @@ export type DNDItem = {
 };
 
 type TierListProps = {
-  title?: string;
-  starterItems?: DNDContainer[];
+  title?: string | null;
+  starterItems?: DNDContainer[] | null;
   success?: boolean;
 };
 

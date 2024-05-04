@@ -10,7 +10,6 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
   const coverImage =
     item.coverImage && item.coverImage !== "" ? item.coverImage : fallbackSrc;
 
-  console.log("coverImage", coverImage);
   const nameAbbreviation = item.user?.name[0].toUpperCase();
 
   return (

@@ -21,7 +21,6 @@ export const imageUpload = async (image: string) => {
     handleUploadUrl: "/api/image/upload",
   });
 
-  console.log("blob", vercelBlobItem);
   if (
     process.env.NEXT_PUBLIC_VERCEL_BLOB_DOMAIN &&
     process.env.NEXT_PUBLIC_TWICPIC_DOMAIN

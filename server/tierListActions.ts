@@ -77,7 +77,6 @@ export const createTierList = async ({
   coverImage?: string;
   guest?: boolean;
 }) => {
-  console.log({ title, content, description, userId, coverImage });
   let guestId = null;
   if (guest) {
     const guest = generateUser();

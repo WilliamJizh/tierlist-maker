@@ -22,9 +22,9 @@ const AddUser = () => {
      const email = generateRandomString(10) + "@example.com";
      const image = generateRandomString(10) + ".png";
 
-     console.log("Adding user...");
+
      const result = await addUser(name, email, image);
-     console.log("User added!", result);
+    
      
    };
    

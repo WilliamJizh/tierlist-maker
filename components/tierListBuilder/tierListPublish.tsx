@@ -35,6 +35,16 @@ export function PublishTierList(props: PublishProps) {
 
   const { user } = useKindeBrowserClient();
 
+  const checkContentEmpty = () => {
+    let isEmpty = true;
+    containers.forEach((container) => {
+      if (container.items.length > 0) {
+        isEmpty = false;
+      }
+    });
+    return isEmpty;
+  }
+
   const handleImageUpload = async () => {
     const imgUploadPremises: Promise<void>[] = [];
     containers.forEach((container) => {
@@ -60,6 +70,13 @@ export function PublishTierList(props: PublishProps) {
 
   const handlePublish = async (guest: boolean) => {
     guest ? setIsPublishing(true) : setIsUserPublishing(true);
+    if (checkContentEmpty()) {
+      toast({ title: "Error", description: "Tier list is empty" });
+      setOpen(false);
+      setIsPublishing(false);
+      setIsUserPublishing(false);
+      return;
+    }
 
     const imageUploadPromises = [];
     let coverImage = "";

@@ -7,6 +7,6 @@ export const generateUser = () => {
     .join(" ");
   return {
     name: randomName,
-    avatar: faker.image.urlLoremFlickr({ category: "animals" }),
+    avatar: faker.image.avatarGitHub(),
   };
 };
