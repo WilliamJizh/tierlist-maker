@@ -89,7 +89,7 @@ export function PublishTierList(props: PublishProps) {
         <DialogHeader>
           <DialogTitle>Publish Tier List</DialogTitle>
           <DialogDescription>
-            Well done! You've created a tier list. Now you can publish it.
+            Well done! Now you can publish your tier list.
           </DialogDescription>
         </DialogHeader>
 
