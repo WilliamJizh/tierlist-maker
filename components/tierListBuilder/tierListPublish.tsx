@@ -75,6 +75,7 @@ export function PublishTierList(props: PublishProps) {
       content: contentJson,
       description: description,
       coverImage: coverImage,
+      guest: true,
     });
     setOpen(false);
     if (!result) {

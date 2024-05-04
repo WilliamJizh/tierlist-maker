@@ -14,7 +14,7 @@ import {
 export const UsersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   image: text("image").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

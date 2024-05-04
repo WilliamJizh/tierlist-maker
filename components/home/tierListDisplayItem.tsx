@@ -11,6 +11,7 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
     item.coverImage && item.coverImage !== "" ? item.coverImage : fallbackSrc;
 
   console.log("coverImage", coverImage);
+  const nameAbbreviation = item.user?.name[0].toUpperCase();
 
   return (
     <Card className=" max-w-xl">
@@ -20,8 +21,11 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
       >
         <div className="flex items-end gap-2 border-b pb-4">
           <Avatar>
-            <AvatarImage src={item.user?.image || ""} alt="@shadcn" />
-            <AvatarFallback>{item.user?.name || "G"}</AvatarFallback>
+            <AvatarImage
+              src={item.user?.image || ""}
+              alt={`@${item.user?.name}`}
+            />
+            <AvatarFallback>{nameAbbreviation || "G"}</AvatarFallback>
           </Avatar>
           <div className="grid ">
             <p className="font-bold">{item.user?.name || "Guest"}</p>

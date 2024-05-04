@@ -66,6 +66,7 @@ type TierListProps = {
 
 const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
+  const url = window.location.href;
   const { toast } = useToast();
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
@@ -645,19 +646,28 @@ const TierList = (props: TierListProps) => {
     router.push("/");
   };
 
+  const copyUrlToClipboard = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "Shareable URL copied",
+        description: "You can now share the URL with others.",
+      });
+    });
+  }
+
   // Render the app, including the DnD context and all containers and items
   return (
     <>
       <TooltipProvider>
-        <div className="flex gap-2 items-center justify-end p-2 py-4 pr-4 sticky top-0 z-40 w-full min-w-max backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b ">
-          <div className="flex-grow  gap-2 items-center pl-4 inline-flex">
+        <div className="sticky top-0 z-40 flex w-full min-w-max items-center justify-end gap-2 border-b p-2 py-4 pr-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 ">
+          <div className="inline-flex  flex-grow items-center gap-2 pl-4">
             <Button
               onClick={handleHomeClick}
               variant="outline"
-              className="w-10 h-10 flex p-2"
+              className="flex h-10 w-10 p-2"
             >
               <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
+                className="h-6 w-6 text-gray-800 dark:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -674,7 +684,7 @@ const TierList = (props: TierListProps) => {
                 />
               </svg>
             </Button>
-            <p className=" font-bold text-xl max-w-64 max-h-12 overflow-x-auto">
+            <p className=" max-h-12 max-w-64 overflow-x-auto text-xl font-bold">
               {title}
             </p>
             <TitleDialog submitTitle={setTitle} title={title} />
@@ -683,6 +693,9 @@ const TierList = (props: TierListProps) => {
               content={containers}
               getTierlistCoverImage={generateScreenshotImage}
             />
+            {url.endsWith("create") ? null : (
+              <Button onClick={copyUrlToClipboard}>Share</Button>
+            )}
           </div>
 
           <Tooltip>
@@ -721,9 +734,7 @@ const TierList = (props: TierListProps) => {
           </Tooltip>
         </div>
 
-
         <div className="p-4 " ref={tierListRef}>
-
           <DndContext
             sensors={sensors}
             // collisionDetection={closestCenter}
@@ -772,17 +783,17 @@ const TierList = (props: TierListProps) => {
             {/* Drawer that pushes content */}
             <div
               ref={benchDrawer}
-              className={`fixed border-t bottom-0 left-0 w-full p-4 pt-3 z-50 bg-background  transition-transform, duration-150 transform ${
+              className={`transition-transform, fixed bottom-0 left-0 z-50 w-full transform border-t bg-background  p-4 pt-3 duration-150 ${
                 isBenchVisible ? "translate-y-0" : "translate-y-full"
               }`}
               id="bench-drawer"
             >
-              <div className="w-full flex justify-between items-center pb-4">
+              <div className="flex w-full items-center justify-between pb-4">
                 <p className="text-pretty text-xl font-bold ">Bench</p>
                 <Button
                   onClick={() => setIsBenchVisible(false)}
                   variant="outline"
-                  className="px-2 w-10 h-10"
+                  className="h-10 w-10 px-2"
                 >
                   <svg
                     className="text-gray-800 dark:text-white"

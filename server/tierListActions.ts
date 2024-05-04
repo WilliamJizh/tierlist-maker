@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "../drizzle/db";
 import * as schema from "../drizzle/schema";
 import { desc, eq, sql } from "drizzle-orm";
+import { generateUser } from "./fakerUser";
+import { User } from "lucide-react";
 
 export const listTierLists = async () => {
   return db.query.TierListTable.findMany({
@@ -24,7 +26,7 @@ export type ListTierListsByPaginationResponse = {
   user: {
     id: number;
     name: string;
-    email: string;
+    email: string | null;
     image: string;
     createdAt: Date;
   } | null;
@@ -32,7 +34,7 @@ export type ListTierListsByPaginationResponse = {
 
 export const listTierListsByPagination = async (
   page: number,
-  limit: number
+  limit: number,
 ): Promise<ListTierListsByPaginationResponse[]> => {
   return db.query.TierListTable.findMany({
     limit: limit,
@@ -54,28 +56,34 @@ export const listRandomTierLists = async (limit: number) => {
   });
 };
 
-interface CreateTierListProps {
-  title: string;
-  content: JSON;
-  description?: string;
-  userId?: number;
-  coverImage?: string;
-}
-
 export const createTierList = async ({
   title,
   content,
   description,
   userId,
   coverImage,
+  guest,
 }: {
   title: string;
   content: JSON;
   description?: string;
   userId?: number;
   coverImage?: string;
+  guest?: boolean;
 }) => {
   console.log({ title, content, description, userId, coverImage });
+  let user = userId;
+  if (guest) {
+    const guest = generateUser();
+    const createGuest = await db
+      .insert(schema.UsersTable)
+      .values({
+        name: guest.name,
+        image: guest.avatar,
+      })
+      .returning({ id: schema.UsersTable.id });
+      user = createGuest[0].id;
+  }
   const tierList = db
     .insert(schema.TierListTable)
     .values({
@@ -83,7 +91,7 @@ export const createTierList = async ({
       tierListContent: content,
       description: description || "",
       coverImage: coverImage,
-      userId: userId,
+      userId: user,
     })
     .returning();
   revalidatePath("/");
