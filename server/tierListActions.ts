@@ -1,5 +1,5 @@
 "use server";
-
+export const dynamic = 'force-dynamic';
 import { revalidatePath } from "next/cache";
 import { db } from "../drizzle/db";
 import * as schema from "../drizzle/schema";
