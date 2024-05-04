@@ -25,11 +25,9 @@ export const InitialServerRender = async (page: number, pageItems: number) => {
 
   return {
     tierlists: (
-      <>
-        {data.map((item) => (
+      data.map((item) => (
           <TierListDisplayItem key={item.id} {...item} />
-        ))}
-      </>
+        ))
     ),
   };
 };

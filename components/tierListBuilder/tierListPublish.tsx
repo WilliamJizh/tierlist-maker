@@ -93,6 +93,8 @@ export function PublishTierList(props: PublishProps) {
           </DialogDescription>
         </DialogHeader>
 
+        <></>
+
         <div className="grid gap-4 py-4">
           <Button className=" m-auto px-8" onClick={handleGuestPublish}>
             Publish As Guest

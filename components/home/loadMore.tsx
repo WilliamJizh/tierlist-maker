@@ -6,7 +6,7 @@ import {
   listTierListsByPagination,
 } from "@/server/tierListActions";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useInView } from "react-intersection-observer";
 import TierListDisplayItem from "./tierListDisplayItem";
