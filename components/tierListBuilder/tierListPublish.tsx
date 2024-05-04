@@ -143,14 +143,14 @@ export function PublishTierList(props: PublishProps) {
                   ? `Publishing`
                   : `Publish As ${user.given_name} ${user.family_name}`}
               </Button>
-              <Button className="m-auto h-auto w-48 text-wrap px-8">
-                <LogoutLink
-                  postLogoutRedirectURL="/create"
-                  onClick={handleLocalStorage}
-                >
-                  Log out
-                </LogoutLink>
-              </Button>
+                {/* <Button className="m-auto h-auto w-48 text-wrap px-8">
+                  <LogoutLink
+                    postLogoutRedirectURL="/create"
+                    onClick={handleLocalStorage}
+                  >
+                    Log out
+                  </LogoutLink>
+                </Button> */}
             </>
           ) : (
             <Button className=" m-auto w-48 px-8">
