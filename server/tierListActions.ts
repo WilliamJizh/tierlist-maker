@@ -1,5 +1,4 @@
 "use server";
-export const dynamic = 'force-dynamic';
 import { revalidatePath } from "next/cache";
 import { db } from "../drizzle/db";
 import * as schema from "../drizzle/schema";
@@ -38,6 +37,7 @@ export const listTierListsByPagination = async (
   page: number,
   limit: number,
 ): Promise<ListTierListsByPaginationResponse[]> => {
+  revalidatePath("/");
   return db.query.TierListTable.findMany({
     limit: limit,
     offset: (page - 1) * limit,
