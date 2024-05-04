@@ -1,23 +1,19 @@
 "use client";
-import React from "react";
+import { DNDItem } from "@/components/tierListBuilder/tierList";
 import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
-  horizontalListSortingStrategy,
-  verticalListSortingStrategy,
+  horizontalListSortingStrategy
 } from "@dnd-kit/sortable";
-import SortableItem from "./sortableItem";
-import { DNDItem } from "@/components/tierListBuilder/tierList";
 import { Button } from "../ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardTitle } from "../ui/card";
+import SortableItem from "./sortableItem";
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
 
@@ -127,7 +123,7 @@ export default function Container(props: ContainerProps) {
                 </svg>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuCheckboxItem
                 onClick={() => props.containerMoveUp(id.toString())}
               >
