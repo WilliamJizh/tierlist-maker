@@ -13,6 +13,7 @@ import {
 
 export const UsersTable = pgTable("users", {
   id: serial("id").primaryKey(),
+  externalId: text("external_id").unique(),
   name: text("name").notNull(),
   email: text("email"),
   image: text("image").notNull(),
