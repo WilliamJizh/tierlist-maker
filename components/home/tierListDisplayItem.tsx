@@ -41,7 +41,7 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
             src={coverImage}
             alt=""
             width={600}
-            height={0}
+            height={800}
             className="w-600 h-auto max-h-[800px] w-full rounded border-2 object-cover"
           />
         ) : (
@@ -49,7 +49,7 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
             src={coverImage}
             alt=""
             width={600}
-            height={0}
+            height={800}
             data-loaded="false"
             onLoad={(event) => {
               event.currentTarget.setAttribute("data-loaded", "true");

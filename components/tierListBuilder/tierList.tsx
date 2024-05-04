@@ -1,57 +1,50 @@
 "use client";
 
-import React, {
-  useCallback,
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-} from "react";
+import Container from "@/components/tierListBuilder/container";
+import { Item } from "@/components/tierListBuilder/sortableItem";
 import type {
-  UniqueIdentifier,
-  DragStartEvent,
-  DragOverEvent,
-  DragEndEvent,
   CollisionDetection,
+  DragOverEvent,
+  DragStartEvent,
+  UniqueIdentifier
 } from "@dnd-kit/core";
 import {
   DndContext,
   DragOverlay,
-  closestCenter,
   KeyboardSensor,
+  MeasuringStrategy,
   MouseSensor,
   TouchSensor,
-  useSensor,
-  useSensors,
-  MeasuringStrategy,
+  closestCenter,
+  getFirstCollision,
   pointerWithin,
   rectIntersection,
-  getFirstCollision,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import Container from "@/components/tierListBuilder/container";
-import { Item } from "@/components/tierListBuilder/sortableItem";
-import { v4 as uuidv4 } from "uuid";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Button } from "../ui/button";
-import { ImageUpload } from "./imageCropper";
 import html2canvas from "html2canvas";
-import { ModeToggle } from "../ui/modeToggleButton";
-import { DrawerTab } from "../ui/drawertab";
+import { useRouter } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Button } from "../ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { direction } from "html2canvas/dist/types/css/property-descriptors/direction";
-import { imageUpload } from "@/components/tierListBuilder/imageUpload";
-import { TitleDialog } from "./titleEdit";
+import { useToast } from "../ui/use-toast";
+import { ImageUpload } from "./imageCropper";
 import { PublishTierList } from "./tierListPublish";
-import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { toast } from "../ui/use-toast";
-import { is } from "drizzle-orm";
+import { TitleDialog } from "./titleEdit";
+
 
 export type DNDContainer = {
   id: UniqueIdentifier;
@@ -68,16 +61,18 @@ export type DNDItem = {
 type TierListProps = {
   title?: string;
   starterItems?: DNDContainer[];
+  success?: boolean;
 };
 
 const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
+  const { toast } = useToast();
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
   const tierListRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(props.title || "New Tier List");
   const [isBenchVisible, setIsBenchVisible] = useState(false);
-
+  const router = useRouter();
   const [containers, setContainers] = useState<DNDContainer[]>(
     props.starterItems || [
       {
@@ -108,8 +103,16 @@ const TierList = (props: TierListProps) => {
     ]
   );
 
-  const router = useRouter();
+  useEffect(() => {
+    if (props.success) {
+      toast({
+        title: "Tierlist published",
+        description: "Your tierlist has been successfully published",
+      });
+    }
+  }, []);
 
+ 
   const toggleBenchVisibility = () => {
     setIsBenchVisible(!isBenchVisible);
   };
@@ -718,10 +721,9 @@ const TierList = (props: TierListProps) => {
           </Tooltip>
         </div>
 
+
         <div className="p-4 " ref={tierListRef}>
-          {/* <div className="header">
-        <h1 className="title">Drag and Drop Example</h1>
-      </div> */}
+
           <DndContext
             sensors={sensors}
             // collisionDetection={closestCenter}

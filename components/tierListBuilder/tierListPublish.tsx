@@ -16,6 +16,8 @@ import { createTierList } from "@/server/tierListActions";
 import { title } from "process";
 import { imageUpload } from "./imageUpload";
 import { useRouter } from "next/navigation";
+import { Textarea } from "../ui/textarea";
+import { toast } from "../ui/use-toast";
 
 type PublishProps = {
   title: string;
@@ -25,6 +27,8 @@ type PublishProps = {
 
 export function PublishTierList(props: PublishProps) {
   const [open, setOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
   const containers = props.content;
   const router = useRouter();
 
@@ -52,6 +56,7 @@ export function PublishTierList(props: PublishProps) {
   };
 
   const handleGuestPublish = async () => {
+    setIsPublishing(true);
     const imageUploadPromises = [];
     let coverImage = "";
 
@@ -59,7 +64,7 @@ export function PublishTierList(props: PublishProps) {
     imageUploadPromises.push(
       handleCoverImageUpload().then((result) => {
         coverImage = result;
-      })
+      }),
     );
 
     await Promise.all(imageUploadPromises);
@@ -68,16 +73,16 @@ export function PublishTierList(props: PublishProps) {
     const result = await createTierList({
       title: props.title,
       content: contentJson,
-      description: "",
+      description: description,
       coverImage: coverImage,
-    }
-    );
+    });
     setOpen(false);
     if (!result) {
       alert("Failed to publish tier list");
+      toast({ title: "Error", description: "Failed to publish tier list" });
       return;
     }
-    router.push(`/tierlist/${result[0].id}`);
+    router.push(`/tierlist/${result[0].id}?success=true`);
   };
 
   return (
@@ -93,13 +98,23 @@ export function PublishTierList(props: PublishProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <></>
+        <Textarea
+          placeholder="Describe your tier list here..."
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
+          value={description}
+        />
 
         <div className="grid gap-4 py-4">
-          <Button className=" m-auto px-8" onClick={handleGuestPublish}>
-            Publish As Guest
+          <Button
+            className=" m-auto w-48 px-8"
+            onClick={handleGuestPublish}
+            disabled={isPublishing}
+          >
+            {isPublishing ? "Publishing..." : "Publish As Guest"}
           </Button>
-          <Button className=" m-auto px-8" disabled>
+          <Button className=" m-auto w-48 px-8" disabled>
             Sign In to Publish
           </Button>
         </div>
