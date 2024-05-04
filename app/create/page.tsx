@@ -1,15 +1,17 @@
 "use client";
-import TierList, { DNDContainer } from "@/components/tierListBuilder/tierList";
+import TierList from "@/components/tierListBuilder/tierList";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  
   const [tierListContent, setTierListContent] = useState<string | null>("");
   const [title, setTitle] = useState<string | null>("");
-
+  
   useEffect(() => {
     setTierListContent(localStorage?.getItem("tierListContent"));
     setTitle(localStorage?.getItem("title"));
   }, []);
+  if (typeof window === "undefined") return null;
 
   if (!tierListContent || !title) {
     return (
