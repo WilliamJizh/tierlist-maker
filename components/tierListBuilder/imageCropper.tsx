@@ -11,6 +11,7 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 type ImageUploadProps = {
   onUpload: (image: string) => void;
@@ -103,42 +104,48 @@ export function ImageUpload(prop: ImageUploadProps) {
         </TooltipContent>
       </Tooltip>
 
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80" align="end">
+        <Label className="pl-2">Upload</Label>
         {image === "" ? (
-          <div className="grid w-full max-w-sm items-center gap-4 pb-4">
-            <Label htmlFor="picture">Upload</Label>
-            <p>Upload A Single Image</p>
-            <Input
-              id="picture"
-              type="file"
-              name="image"
-              accept="image/*"
-              onChange={onFileChange}
-            />
-            <p>Upload Multiple Images</p>
-            <Input
-              id="pictures"
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              onChange={(event) => {
-                if (event.target.files && event.target.files.length > 0) {
-                  const images: string[] = [];
-                  for (let i = 0; i < event.target.files.length; i++) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      images.push(reader.result as string);
-                      if (images.length === event.target.files?.length) {
-                        batchUpload(images);
-                      }
-                    };
-                    reader.readAsDataURL(event.target.files[i]);
+          <Tabs defaultValue="single" className="p-2">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="single">Single Image</TabsTrigger>
+              <TabsTrigger value="multiple">Multiple Image</TabsTrigger>
+            </TabsList>
+            <TabsContent value="single" className="pt-2">
+              <Input
+                id="picture"
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={onFileChange}
+              />
+            </TabsContent>
+            <TabsContent value="multiple" className="pt-2">
+              <Input
+                id="pictures"
+                type="file"
+                name="images"
+                accept="image/*"
+                multiple
+                onChange={(event) => {
+                  if (event.target.files && event.target.files.length > 0) {
+                    const images: string[] = [];
+                    for (let i = 0; i < event.target.files.length; i++) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        images.push(reader.result as string);
+                        if (images.length === event.target.files?.length) {
+                          batchUpload(images);
+                        }
+                      };
+                      reader.readAsDataURL(event.target.files[i]);
+                    }
                   }
-                }
-              }}
-            />
-          </div>
+                }}
+              />
+            </TabsContent>
+          </Tabs>
         ) : (
           <Cropper
             ref={cropperRef}

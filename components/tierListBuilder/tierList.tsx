@@ -6,7 +6,7 @@ import type {
   CollisionDetection,
   DragOverEvent,
   DragStartEvent,
-  UniqueIdentifier
+  UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   DndContext,
@@ -26,12 +26,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "../ui/button";
 import {
@@ -44,7 +39,6 @@ import { useToast } from "../ui/use-toast";
 import { ImageUpload } from "./imageCropper";
 import { PublishTierList } from "./tierListPublish";
 import { TitleDialog } from "./titleEdit";
-
 
 export type DNDContainer = {
   id: UniqueIdentifier;
@@ -101,7 +95,7 @@ const TierList = (props: TierListProps) => {
         title: "Bench",
         items: [],
       },
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -113,14 +107,13 @@ const TierList = (props: TierListProps) => {
     }
   }, []);
 
- 
   const toggleBenchVisibility = () => {
     setIsBenchVisible(!isBenchVisible);
   };
 
   const addContainer = (id?: string, direction?: string) => {
     const benchContainerIndex = containers.findIndex(
-      (container) => container.id === "bench"
+      (container) => container.id === "bench",
     );
 
     const newContainerItems = {
@@ -131,7 +124,7 @@ const TierList = (props: TierListProps) => {
 
     if (direction === "above" && id) {
       const containerIndex = containers.findIndex(
-        (container) => container.id === id
+        (container) => container.id === id,
       );
       setContainers((currentItems) => [
         ...currentItems.slice(0, containerIndex),
@@ -140,7 +133,7 @@ const TierList = (props: TierListProps) => {
       ]);
     } else if (direction === "below" && id) {
       const containerIndex = containers.findIndex(
-        (container) => container.id === id
+        (container) => container.id === id,
       );
       setContainers((currentItems) => [
         ...currentItems.slice(0, containerIndex + 1),
@@ -160,7 +153,7 @@ const TierList = (props: TierListProps) => {
   const addItem = (image: string) => {
     setContainers((currentItems) => {
       const containerIndex = currentItems.findIndex(
-        (container) => container.id === "bench"
+        (container) => container.id === "bench",
       );
 
       if (containerIndex === -1) {
@@ -201,7 +194,7 @@ const TierList = (props: TierListProps) => {
   const setContainerTitle = (title: string, id: string) => {
     setContainers((currentItems) => {
       const containerIndex = currentItems.findIndex(
-        (container) => container.id === id
+        (container) => container.id === id,
       );
 
       if (containerIndex === -1) {
@@ -222,7 +215,7 @@ const TierList = (props: TierListProps) => {
 
   const containerMoveUp = (id: string) => {
     const containerIndex = containers.findIndex(
-      (container) => container.id === id
+      (container) => container.id === id,
     );
 
     if (containerIndex <= 0) {
@@ -240,7 +233,7 @@ const TierList = (props: TierListProps) => {
 
   const containerMoveDown = (id: string) => {
     const containerIndex = containers.findIndex(
-      (container) => container.id === id
+      (container) => container.id === id,
     );
 
     if (containerIndex === -1 || containerIndex >= containers.length - 1) {
@@ -280,7 +273,7 @@ const TierList = (props: TierListProps) => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const [activeItemContent, setActiveItemContent] = useState<
@@ -301,10 +294,10 @@ const TierList = (props: TierListProps) => {
 
       // find the container by looking into each of them
       return containers.find((container) =>
-        container.items.some((item) => item.id === id)
+        container.items.some((item) => item.id === id),
       )?.id;
     },
-    [containers]
+    [containers],
   );
 
   // Ref to store the state of items before a drag operation begins
@@ -328,12 +321,12 @@ const TierList = (props: TierListProps) => {
       // Set the active (dragged) item id
       const activeItem = containers
         .find((container) =>
-          container.items.some((item) => item.id === active.id)
+          container.items.some((item) => item.id === active.id),
         )
         ?.items.find((item) => item.id === active.id);
       setActiveItemContent(activeItem);
     },
-    [containers]
+    [containers],
   );
 
   // Function called when an item is dragged over another container
@@ -352,7 +345,7 @@ const TierList = (props: TierListProps) => {
         if (container) return container;
         // find the container by looking into each of them
         return containers.find((container) =>
-          container.items.some((item) => item.id === id)
+          container.items.some((item) => item.id === id),
         );
       };
 
@@ -380,11 +373,11 @@ const TierList = (props: TierListProps) => {
           if (container.id === overContainer.id) {
             // Add the item to the new container
             const activeItem = activeContainer.items.find(
-              (item) => item.id === activeId
+              (item) => item.id === activeId,
             );
             if (!activeItem) return container;
             const overItemIndex = container.items.findIndex(
-              (item) => item.id === overId
+              (item) => item.id === overId,
             );
             let newContainerItems = [...container.items];
 
@@ -406,7 +399,7 @@ const TierList = (props: TierListProps) => {
 
       recentlyMovedToNewContainer.current = true;
     },
-    [containers]
+    [containers],
   );
 
   // Function called when a drag operation ends
@@ -418,10 +411,10 @@ const TierList = (props: TierListProps) => {
       }
 
       const activeContainerIndex = containers.findIndex((container) =>
-        container.items.some((item) => item.id === active.id)
+        container.items.some((item) => item.id === active.id),
       );
       const overContainerIndex = containers.findIndex((container) =>
-        container.items.some((item) => item.id === over.id)
+        container.items.some((item) => item.id === over.id),
       );
 
       if (activeContainerIndex === -1 || overContainerIndex === -1) {
@@ -432,7 +425,7 @@ const TierList = (props: TierListProps) => {
       const activeItems = containers[activeContainerIndex].items;
       const overItems = containers[overContainerIndex].items;
       const activeIndex = activeItems.findIndex(
-        (item) => item.id === active.id
+        (item) => item.id === active.id,
       );
       const overIndex = overItems.findIndex((item) => item.id === over.id);
 
@@ -452,7 +445,7 @@ const TierList = (props: TierListProps) => {
       setContainers(newItems);
       setActiveItemContent(undefined);
     },
-    [containers]
+    [containers],
   );
 
   // Function called when a drag operation is cancelled
@@ -480,7 +473,7 @@ const TierList = (props: TierListProps) => {
         return closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter(
-            (container) => container.id in containers
+            (container) => container.id in containers,
           ),
         });
       }
@@ -511,7 +504,7 @@ const TierList = (props: TierListProps) => {
               droppableContainers: args.droppableContainers.filter(
                 (container) =>
                   container.id !== overId &&
-                  containerItems.includes(container.id)
+                  containerItems.includes(container.id),
               ),
             })[0]?.id;
           }
@@ -533,7 +526,7 @@ const TierList = (props: TierListProps) => {
       // If no droppable is matched, return the last match
       return lastOverId.current ? [{ id: lastOverId.current }] : [];
     },
-    [activeItemContent, containers]
+    [activeItemContent, containers],
   );
 
   // useEffect hook called after a drag operation, to clear the "just moved" status
@@ -551,7 +544,6 @@ const TierList = (props: TierListProps) => {
     const clone: HTMLElement = parent.cloneNode(true) as HTMLElement;
     clone.classList.add("bg-background");
     clone.classList.add("h-fit");
-    
 
     // Add styles to keep the clone invisible
     clone.style.position = "absolute";
@@ -578,7 +570,7 @@ const TierList = (props: TierListProps) => {
     }
 
     //remove extra bottom paddings
-    if (isBenchVisible){
+    if (isBenchVisible) {
       const parentBackground = clone.querySelector(".parent-background");
       parentBackground?.classList.remove("mb-56");
     }
@@ -612,7 +604,7 @@ const TierList = (props: TierListProps) => {
 
         // Clean up: remove the clone from the body
         document.body.removeChild(clone);
-      }
+      },
     );
   };
 
@@ -622,7 +614,7 @@ const TierList = (props: TierListProps) => {
       toast({
         title: "Failed to take screenshot",
         description: "Please try again.",
-      })
+      });
       return "";
     }
     // Append the clone to the body to make it part of the document temporarily
@@ -653,7 +645,7 @@ const TierList = (props: TierListProps) => {
         description: "You can now share the URL with others.",
       });
     });
-  }
+  };
 
   // Render the app, including the DnD context and all containers and items
   return (
@@ -721,17 +713,6 @@ const TierList = (props: TierListProps) => {
           </Tooltip>
 
           <ImageUpload onUpload={addItem} />
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" onClick={toggleBenchVisibility}>
-                <p>Bench</p>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Show/Hide bench</p>
-            </TooltipContent>
-          </Tooltip>
         </div>
 
         <div className="p-4 " ref={tierListRef}>
@@ -781,54 +762,73 @@ const TierList = (props: TierListProps) => {
             </div>
 
             {/* Drawer that pushes content */}
+
             <div
               ref={benchDrawer}
-              className={`transition-transform, fixed bottom-0 left-0 z-50 w-full transform border-t bg-background  p-4 pt-3 duration-150 ${
+              className={`fixed bottom-0 left-0 z-50 w-full transform px-2 transition-transform duration-150 ${
                 isBenchVisible ? "translate-y-0" : "translate-y-full"
               }`}
               id="bench-drawer"
             >
-              <div className="flex w-full items-center justify-between pb-4">
-                <p className="text-pretty text-xl font-bold ">Bench</p>
-                <Button
-                  onClick={() => setIsBenchVisible(false)}
-                  variant="outline"
-                  className="h-10 w-10 px-2"
+              <div className="rounded-t-lg border-2 border-b-0 border-neutral-100 bg-background p-6 pt-3 ">
+                <div
+                  className="absolute right-0 top-0 -translate-x-8 -translate-y-[calc(100%-2px)]   transform cursor-pointer rounded-t-lg border-2 border-b-0 border-neutral-100 bg-background p-1 px-4  text-center text-sm "
+                  onClick={toggleBenchVisibility}
                 >
-                  <svg
-                    className="text-gray-800 dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="3"
-                      d="M6 18L17.94 6M18 18L6.06 6"
-                    />
-                  </svg>
-                </Button>
+                  <div className="flex items-center justify-center gap-2">
+                    {!isBenchVisible ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="h-4 w-4 "
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="h-4 w-4 "
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    )}
+                    Bench
+                  </div>
+                </div>
+                <div className="flex w-full items-center justify-between pb-4">
+                  <p className="text-pretty text-xl font-bold ">Bench</p>
+                </div>
+                <Container
+                  key={"bench"}
+                  id={"bench"}
+                  items={
+                    containers.find((container) => container.id === "bench")
+                      ?.items || []
+                  }
+                  title={"Bench"}
+                  activeItemId={activeItemContent?.id.toString() || ""}
+                  setTitle={setContainerTitle}
+                  removeContainer={removeContainer}
+                  containerMoveUp={containerMoveUp}
+                  containerMoveDown={containerMoveDown}
+                  onRemoveItem={removeItem}
+                />
               </div>
-              <Container
-                key={"bench"}
-                id={"bench"}
-                items={
-                  containers.find((container) => container.id === "bench")
-                    ?.items || []
-                }
-                title={"Bench"}
-                activeItemId={activeItemContent?.id.toString() || ""}
-                setTitle={setContainerTitle}
-                removeContainer={removeContainer}
-                containerMoveUp={containerMoveUp}
-                containerMoveDown={containerMoveDown}
-                onRemoveItem={removeItem}
-              />
             </div>
 
             {/* Use CSS.Translate.toString(transform) in `Item` style if overlay is disabled */}
