@@ -6,6 +6,8 @@ import * as schema from "../drizzle/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { generateUser } from "./fakerUser";
 import { User } from "lucide-react";
+import { faker } from "@faker-js/faker";
+import { uuid } from "drizzle-orm/pg-core";
 
 export const listTierLists = async () => {
   return db.query.TierListTable.findMany({
@@ -63,16 +65,20 @@ export const createTierList = async ({
   userId,
   coverImage,
   guest,
+  userImage,
+  userName,
 }: {
   title: string;
   content: JSON;
   description?: string;
-  userId?: number;
+  userId?: string;
+  userName?: string;  
+  userImage?: string;
   coverImage?: string;
   guest?: boolean;
 }) => {
   console.log({ title, content, description, userId, coverImage });
-  let user = userId;
+  let guestId = null;
   if (guest) {
     const guest = generateUser();
     const createGuest = await db
@@ -82,8 +88,25 @@ export const createTierList = async ({
         image: guest.avatar,
       })
       .returning({ id: schema.UsersTable.id });
-      user = createGuest[0].id;
+      guestId = createGuest[0].id;
   }
+
+  const upsertUser = await db
+    .insert(schema.UsersTable)
+    .values({
+      externalId: userId || null,
+      name: userName || "N/A",
+      image: userImage || faker.image.avatar(),
+    })
+    .onConflictDoUpdate({
+      target: [schema.UsersTable.externalId],
+      set: {
+        name: userName || "N/A",
+        image: userImage,
+      },
+    })
+    .returning();
+
   const tierList = db
     .insert(schema.TierListTable)
     .values({
@@ -91,7 +114,7 @@ export const createTierList = async ({
       tierListContent: content,
       description: description || "",
       coverImage: coverImage,
-      userId: user,
+      userId: guest ? guestId : upsertUser[0].id,
     })
     .returning();
   revalidatePath("/");
