@@ -8,9 +8,9 @@ import { Analytics } from "@vercel/analytics/react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BuildTierList.pro - Create, Share, and Rerank Custom Tier Lists",
+  title: "Create Tier List - Create, Share, and Rerank Tier Lists",
   description:
-    "BuildTierList.pro enables users to create and share custom tier lists across various categories. Our platform allows for easy customization, community sharing, and the ability to rerank existing lists. Join to explore and contribute to diverse rankings.",
+    "CreateTierList.com enables users to create and share custom tier lists across various categories. Our platform allows for easy customization, community sharing, and the ability to rerank existing lists. Join to explore and contribute to diverse rankings.",
 };
 
 export default function RootLayout({
