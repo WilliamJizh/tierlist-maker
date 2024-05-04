@@ -50,7 +50,7 @@ const Spinner = () => {
         "animate-spin",
         "text-gray-800",
         "dark:text-white",
-        "m-auto"
+        "m-auto",
       )}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
@@ -84,22 +84,26 @@ const InfiniteScrollClient = () => {
 
   return (
     <>
-    <InfiniteScroll
-      dataLength={data.length}
-      next={fetchData}
-      hasMore={hasMore}
-      loader={
-        <div className=" w-full py-4">
-          <Spinner />
-        </div>
-      }
-      className="grid  gap-4 p-4 "
-    >
-      {data.map((item) => (
-        <TierListDisplayItem key={item.id} {...item} />
-      ))}
-    </InfiniteScroll>
-    {!hasMore && <p className="text-center text-sm border-t pt-2 text-neutral-500">You have reached the end</p>}
+      <InfiniteScroll
+        dataLength={data.length}
+        next={fetchData}
+        hasMore={hasMore}
+        loader={
+          <div className=" w-full py-4">
+            <Spinner />
+          </div>
+        }
+        className="grid gap-4"
+      >
+        {data.map((item) => (
+          <TierListDisplayItem key={item.id} {...item} />
+        ))}
+      </InfiniteScroll>
+      {!hasMore && (
+        <p className="border-t pt-2 text-center text-sm text-neutral-500">
+          You have reached the end
+        </p>
+      )}
     </>
   );
 };

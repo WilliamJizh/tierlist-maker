@@ -15,10 +15,10 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
   return (
     <Card className=" max-w-xl">
       <Link
-        className="grid p-4 gap-4 m-auto cursor-pointer"
+        className="m-auto grid cursor-pointer gap-4 p-4"
         href={`/tierlist/${item.id}`}
       >
-        <div className="flex items-end gap-2 pb-4 border-b">
+        <div className="flex items-end gap-2 border-b pb-4">
           <Avatar>
             <AvatarImage src={item.user?.image || ""} alt="@shadcn" />
             <AvatarFallback>{item.user?.name || "G"}</AvatarFallback>
@@ -42,7 +42,7 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
             alt=""
             width={600}
             height={0}
-            className="w-full rounded border-2 max-h-[800px] h-auto w-600 object-cover"
+            className="w-600 h-auto max-h-[800px] w-full rounded border-2 object-cover"
           />
         ) : (
           <Image
@@ -54,12 +54,12 @@ const TierListDisplayItem = (item: ListTierListsByPaginationResponse) => {
             onLoad={(event) => {
               event.currentTarget.setAttribute("data-loaded", "true");
             }}
-            className="w-full data-[loaded=false]:animate-pulse data-[loaded=false]:bg-gray-100/10 rounded border-2 max-h-[600px] h-auto w-800 object-cover"
+            className="w-800 h-auto max-h-[600px] w-full rounded border-2 object-cover data-[loaded=false]:animate-pulse data-[loaded=false]:bg-gray-100/10"
           />
         )}
 
         <div className="flex flex-col pb-4">
-          <CardTitle>{item.title}</CardTitle>
+          <p className="font-bold">{item.title}</p>
           {item.description && item.description !== "" && (
             <CardDescription className="pt-2">
               {item.description}

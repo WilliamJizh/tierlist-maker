@@ -7,17 +7,20 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col lg:flex-row">
-        <div className="sticky top-0 z-40 flex w-full items-center justify-center border-b backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:h-screen lg:justify-end lg:border-r-2">
-          <div className="flex h-full p-16 ">
+        <div className="sticky top-0 z-40 flex w-full items-center justify-center border-b backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:h-screen lg:justify-end lg:border-b-0 lg:border-r">
+          <div className="flex h-full max-w-md p-8">
             <div className="m-auto grid items-center justify-center">
-              <h1 className="text-4xl font-bold">
-                Build and Share Your Tier List
-              </h1>
-              <p className="text-lg text-zinc-500">
-                Create your own tier list and share it with your friends.
+              <div className="absolute z-10 h-64 w-64 rounded-full bg-gradient-to-b from-white/30 to-transparent blur-3xl"></div>
+              <h1 className="text-4xl font-bold">Making A Tier List?</h1>
+              <p className="mt-2 text-zinc-400">
+                A tier list is a concept originating in video game culture where
+                playable characters or other in-game elements are subjectively
+                ranked by their respective viability as part of a list.
               </p>
               <Button className="m-auto mt-6">
-                <Link href={"/create"}>Create Yours</Link>
+                <Link href={"/create"} className=" cursor-pointer">
+                  Create Your List
+                </Link>
               </Button>
             </div>
           </div>

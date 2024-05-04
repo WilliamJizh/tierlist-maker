@@ -13,10 +13,10 @@ import { LoadMore } from "./loadMore";
 const TierListInfiniteScroll = async () => {
   const { tierlists } = await InitialServerRender(1, 2);
   return (
-    <>
+    <div className="grid justify-center gap-4 px-2 lg:justify-start">
       {tierlists}
       <LoadMore />
-    </>
+    </div>
   );
 };
 
@@ -25,11 +25,11 @@ export const InitialServerRender = async (page: number, pageItems: number) => {
 
   return {
     tierlists: (
-      <div className="grid justify-center gap-4 p-4 px-6 lg:justify-start">
+      <>
         {data.map((item) => (
           <TierListDisplayItem key={item.id} {...item} />
         ))}
-      </div>
+      </>
     ),
   };
 };

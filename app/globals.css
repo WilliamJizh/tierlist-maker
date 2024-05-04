@@ -2,23 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .border-glow-right {
-    position: relative;
-  }
-
-  .border-glow-right::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 2px; /* Width of the glowing border */
-    height: 100%;
-    background-color: transparent;
-    box-shadow: 0 0 8px rgba(90, 70, 160, 0.8); /* Adjust the color and intensity */
-    pointer-events: none; /* Ensures clicks go through this pseudo-element */
-  }
-}
 
 @layer base {
   img {
