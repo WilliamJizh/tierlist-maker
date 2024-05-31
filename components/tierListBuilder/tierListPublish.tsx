@@ -125,7 +125,7 @@ export function PublishTierList(props: PublishProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button onClick={() => setOpen(true)}>Publish</Button>
+          <Button variant="outline" onClick={() => setOpen(true)}>Publish</Button>
         </TooltipTrigger>
         <TooltipContent>
           <p>{`You'll be able to share your tierlist after it being published`}</p>

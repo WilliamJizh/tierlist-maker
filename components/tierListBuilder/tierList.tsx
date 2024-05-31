@@ -681,14 +681,19 @@ const TierList = (props: TierListProps) => {
               {title}
             </p>
             <TitleDialog submitTitle={setTitle} title={title} />
-            <PublishTierList
-              title={title}
-              content={containers}
-              getTierlistCoverImage={generateScreenshotImage}
-            />
+
+            {url.endsWith("/") ? (
+              <PublishTierList
+                title={title}
+                content={containers}
+                getTierlistCoverImage={generateScreenshotImage}
+              />
+            ) : null}
 
             {url.endsWith("/") ? null : (
-              <Button onClick={copyUrlToClipboard}>Share</Button>
+              <Button onClick={copyUrlToClipboard} variant="outline">
+                Share
+              </Button>
             )}
           </div>
           <Tooltip>
