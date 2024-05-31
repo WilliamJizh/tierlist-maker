@@ -18,6 +18,7 @@ import { Textarea } from "../ui/textarea";
 import { toast } from "../ui/use-toast";
 import { imageUpload } from "./imageUpload";
 import { DNDContainer } from "./tierList";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type PublishProps = {
   title: string;
@@ -43,7 +44,7 @@ export function PublishTierList(props: PublishProps) {
       }
     });
     return isEmpty;
-  }
+  };
 
   const handleImageUpload = async () => {
     const imgUploadPremises: Promise<void>[] = [];
@@ -122,9 +123,14 @@ export function PublishTierList(props: PublishProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Publish</Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={() => setOpen(true)}>Publish</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{`You'll be able to share your tierlist after it being published`}</p>
+        </TooltipContent>
+      </Tooltip>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Publish Tier List</DialogTitle>
@@ -160,7 +166,7 @@ export function PublishTierList(props: PublishProps) {
                   ? `Publishing`
                   : `Publish As ${user.given_name} ${user.family_name}`}
               </Button>
-                {/* <Button className="m-auto h-auto w-48 text-wrap px-8">
+              {/* <Button className="m-auto h-auto w-48 text-wrap px-8">
                   <LogoutLink
                     postLogoutRedirectURL="/create"
                     onClick={handleLocalStorage}

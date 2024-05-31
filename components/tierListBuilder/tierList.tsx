@@ -639,7 +639,8 @@ const TierList = (props: TierListProps) => {
   };
 
   const copyUrlToClipboard = () => {
-    navigator.clipboard.writeText(url).then(() => {
+    const cleanUrl = url.split("?")[0];
+    navigator.clipboard.writeText(cleanUrl).then(() => {
       toast({
         title: "Shareable URL copied",
         description: "You can now share the URL with others.",
@@ -653,7 +654,7 @@ const TierList = (props: TierListProps) => {
       <TooltipProvider>
         <div className="sticky top-0 z-40 flex w-full min-w-max items-center justify-end gap-2 border-b p-2 py-4 pr-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 ">
           <div className="inline-flex  flex-grow items-center gap-2 pl-4">
-            <Button
+            {/* <Button
               onClick={handleHomeClick}
               variant="outline"
               className="flex h-10 w-10 p-2"
@@ -675,7 +676,7 @@ const TierList = (props: TierListProps) => {
                   d="m15 19-7-7 7-7"
                 />
               </svg>
-            </Button>
+            </Button> */}
             <p className=" max-h-12 max-w-64 overflow-x-auto text-xl font-bold">
               {title}
             </p>
@@ -685,11 +686,11 @@ const TierList = (props: TierListProps) => {
               content={containers}
               getTierlistCoverImage={generateScreenshotImage}
             />
-            {url.endsWith("create") ? null : (
+
+            {url.endsWith("/") ? null : (
               <Button onClick={copyUrlToClipboard}>Share</Button>
             )}
           </div>
-
           <Tooltip>
             <TooltipTrigger asChild>
               <Button onClick={takeScreenshot} variant="outline">

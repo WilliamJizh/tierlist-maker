@@ -1,11 +1,12 @@
 import TierListInfiniteScroll from "@/components/home/tierListInfiniteScroll";
+import TierList from "@/components/tierListBuilder/tierList";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <>
-      <div className="flex flex-col lg:flex-row">
+      {/* <div className="flex flex-col lg:flex-row">
         <div className="sticky top-0 z-40 flex w-full items-center justify-center border-b backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:h-screen lg:justify-end lg:border-b-0 lg:border-r">
           <div className="flex h-full max-w-md p-8">
             <div className="m-auto grid items-center justify-center">
@@ -26,7 +27,11 @@ export default function Home() {
         <div className="w-full p-6">
           <TierListInfiniteScroll />
         </div>
-      </div>
+      </div> */}
+      <TierList
+        starterItems={null}
+        title={null}
+      />
     </>
   );
 }
