@@ -1,11 +1,9 @@
-import TierListInfiniteScroll from "@/components/home/tierListInfiniteScroll";
+"use client"
 import TierList from "@/components/tierListBuilder/tierList";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function Home() {
   return (
-    <>
+    <div>
       {/* <div className="flex flex-col lg:flex-row">
         <div className="sticky top-0 z-40 flex w-full items-center justify-center border-b backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:h-screen lg:justify-end lg:border-b-0 lg:border-r">
           <div className="flex h-full max-w-md p-8">
@@ -32,6 +30,6 @@ export default function Home() {
         starterItems={null}
         title={null}
       />
-    </>
+    </div>
   );
 }
