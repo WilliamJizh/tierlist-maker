@@ -60,7 +60,7 @@ type TierListProps = {
 
 const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
-  let url = "";
+  let url = "/";
   if (typeof window !== "undefined") {
     url = window.location.href;
   }
@@ -692,13 +692,12 @@ const TierList = (props: TierListProps) => {
                 content={containers}
                 getTierlistCoverImage={generateScreenshotImage}
               />
-            ) : null}
-
-            {url.endsWith("/") ? null : (
-              <Button onClick={copyUrlToClipboard} variant="outline" >
+            ) : (
+              <Button onClick={copyUrlToClipboard} variant="outline">
                 Share
               </Button>
             )}
+
           </div>
           <Tooltip>
             <TooltipTrigger asChild>
