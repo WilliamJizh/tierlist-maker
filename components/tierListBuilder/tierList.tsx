@@ -60,7 +60,11 @@ type TierListProps = {
 
 const TierList = (props: TierListProps) => {
   // Maintain state for each container and the items they contain
-  const url = window.location.href;
+  let url = "";
+  if (typeof window !== "undefined") {
+    url = window.location.href;
+  }
+
   const { toast } = useToast();
   const [parent] = useAutoAnimate();
   const [benchDrawer] = useAutoAnimate();
@@ -691,7 +695,7 @@ const TierList = (props: TierListProps) => {
             ) : null}
 
             {url.endsWith("/") ? null : (
-              <Button onClick={copyUrlToClipboard} variant="outline">
+              <Button onClick={copyUrlToClipboard} variant="outline" >
                 Share
               </Button>
             )}
