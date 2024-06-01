@@ -47,6 +47,7 @@
     "react-intersection-observer": "^9.10.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "undici": "^6.18.2",
     "uploadthing": "^6.10.1",
     "use-react-screenshot": "^4.0.0",
     "uuid": "^9.0.1",
