@@ -176,7 +176,7 @@ export function PublishTierList(props: PublishProps) {
                 </Button> */}
             </>
           ) : (
-            <Button className=" m-auto w-48 px-8">
+            <Button className=" m-auto w-48 px-8" disabled>
               <LoginLink
                 postLoginRedirectURL="/create"
                 onClick={handleLocalStorage}
