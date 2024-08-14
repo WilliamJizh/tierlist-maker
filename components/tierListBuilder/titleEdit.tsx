@@ -29,7 +29,7 @@ export function TitleDialog(props: ImageUploadProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Rename</Button>
+        <Button variant="outline" className="ml-2">Rename</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
